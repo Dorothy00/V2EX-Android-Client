@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class V2EXHttpClient {
     private static Context context;
 
-    public static final String BASE_URL = "http://www.v2ex.com";
+    public static final String BASE_URL = "https://www.v2ex.com";
     private static OkHttpClient mOkhttpClient;
     private static Retrofit mRetrofit;
 
@@ -25,11 +25,11 @@ public class V2EXHttpClient {
         if (httpClientBuilder.interceptors() != null) {
             httpClientBuilder.interceptors().clear();
         }
-       httpClientBuilder.addNetworkInterceptor(new AddCookieIntercepter(context));
-        httpClientBuilder.addInterceptor(new RecivedCookieIntercepter(context));
+//       httpClientBuilder.addInterceptor(new AddCookieIntercepter(context));
+//        httpClientBuilder.addInterceptor(new RecivedCookieIntercepter(context));
 //        httpClientBuilder
 //                .addNetworkInterceptor(new AddCookieIntercepter(context));
-//        httpClientBuilder.addNetworkInterceptor(new RecivedCookieIntercepter(context)).addNetworkInterceptor(new AddCookieIntercepter(context));
+        httpClientBuilder.addNetworkInterceptor(new RecivedCookieIntercepter(context)).addNetworkInterceptor(new AddCookieIntercepter(context));
 
         httpClientBuilder.connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS);
 

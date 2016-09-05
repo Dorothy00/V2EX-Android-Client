@@ -19,7 +19,7 @@ public class V2EXCookieManager {
     private static final String EXPIRES_KEY = "expires";
     private static final String REFER_KEY = "refer";
 
-    public static void storeCookie(Context context, String cookie) {
+    public static void  storeCookie(Context context, String cookie) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(COOKIE_KEY, Context
                 .MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();

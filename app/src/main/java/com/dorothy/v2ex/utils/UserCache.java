@@ -18,6 +18,7 @@ public class UserCache {
                 .MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(PROFILE_KEY, new Gson().toJson(userProfile));
+        editor.commit();
     }
 
     public static UserProfile getUser(Context context) {

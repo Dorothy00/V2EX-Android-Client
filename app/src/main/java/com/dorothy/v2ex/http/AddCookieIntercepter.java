@@ -32,7 +32,7 @@ public class AddCookieIntercepter implements Interceptor {
             builder.addHeader("Referer", refer);
         }
         builder.addHeader("Host", "www.v2ex.com");
-        builder.addHeader("Origin", "http://www.v2ex.com");
+        builder.addHeader("Origin", "https://www.v2ex.com");
         builder.addHeader("Upgrade-Insecure-Requests", "1");
         builder.addHeader("Connection", "keep-alive");
         builder.addHeader("Cache-Control", "max-age=0");
