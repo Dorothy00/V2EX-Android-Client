@@ -1,0 +1,56 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- corner -->
+    <dimen name="corner1">2dp</dimen>
+    <dimen name="corner2">4dp</dimen>
+    <dimen name="corner3">6dp</dimen>
+    <dimen name="corner4">8dp</dimen>
+
+    <!-- textSize -->
+    <dimen name="textSize1">2sp</dimen>
+    <dimen name="textSize2">4sp</dimen>
+    <dimen name="textSize3">6sp</dimen>
+    <dimen name="textSize4">8sp</dimen>
+    <dimen name="textSize5">10sp</dimen>
+    <dimen name="textSize6">12sp</dimen>
+    <dimen name="textSize7">14sp</dimen>
+    <dimen name="textSize8">16sp</dimen>
+    <dimen name="textSize9">18sp</dimen>
+    <dimen name="textSize10">20sp</dimen>
+    <dimen name="textSize20">40sp</dimen>
+    <dimen name="textSize22">44sp</dimen>
+    <dimen name="textSize30">60sp</dimen>
+
+    <!-- padding -->
+    <dimen name="padding1">2dp</dimen>
+    <dimen name="padding1.5">3dp</dimen>
+    <dimen name="padding2">4dp</dimen>
+    <dimen name="padding3">6dp</dimen>
+    <dimen name="padding4">8dp</dimen>
+    <dimen name="padding5">10dp</dimen>
+    <dimen name="padding6">12dp</dimen>
+    <dimen name="padding7">14dp</dimen>
+    <dimen name="padding8">16dp</dimen>
+    <dimen name="padding9">18dp</dimen>
+    <dimen name="padding10">20dp</dimen>
+    <dimen name="padding12">24dp</dimen>
+
+    <!-- margin -->
+    <dimen name="margin1">2dp</dimen>
+    <dimen name="margin2">4dp</dimen>
+    <dimen name="margin3">6dp</dimen>
+    <dimen name="margin4">8dp</dimen>
+    <dimen name="margin5">10dp</dimen>
+    <dimen name="margin6">12dp</dimen>
+    <dimen name="margin7">14dp</dimen>
+    <dimen name="margin8">16dp</dimen>
+    <dimen name="margin9">18dp</dimen>
+    <dimen name="margin10">20dp</dimen>
+    <dimen name="margin15">30dp</dimen>
+    <dimen name="margin20">40dp</dimen>
+    <dimen name="margin30">60dp</dimen>
+    <dimen name="margin40">80dp</dimen>
+</resources>

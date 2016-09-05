@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="node_grey">#E2E2E2</color>
+    <color name="reply_grey_dark">#969CB0</color>
+    <color name="reply_text">#F4F3F4</color>
+    <color name="v2ex_grey">#444454</color>
+    <color name="v2ex_normal_white">#E7E7E8</color>
+    <color name="primary_dark">#465A63</color>
+    <color name="primary">#617D8A</color>
+    <color name="window_background">#FAFAFA</color>
+    <color name="grey_line">#DEE0E0</color>
+    <color name="text_grey">#8C8E8E</color>
+    <color name="text_thunder">#4B4D4D</color>
+    <color name="login_text_shadow">#eeE7E7E8</color>
+    <color name="login_text_normal">#E7E7E8</color>
+</resources>

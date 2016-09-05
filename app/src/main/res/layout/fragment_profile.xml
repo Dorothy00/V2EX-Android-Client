@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.ProfileFragment">
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:background="@color/v2ex_grey"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/padding10"
+        android:paddingTop="@dimen/padding10">
+
+        <com.dorothy.v2ex.View.CircleImageView
+            android:id="@+id/avatar"
+            android:layout_width="70dp"
+            android:layout_height="70dp"/>
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin5"
+            android:layout_marginTop="@dimen/margin7"
+            android:text="hello"
+            android:textColor="@color/v2ex_normal_white"
+            android:textSize="@dimen/textSize8"/>
+    </LinearLayout>
+    <TextView
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:text="text"/>
+</LinearLayout>
