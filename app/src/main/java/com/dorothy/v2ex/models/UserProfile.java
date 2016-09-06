@@ -8,16 +8,17 @@ import java.io.Serializable;
 public class UserProfile implements Serializable{
     private String username;
     private String avatar;
-    private int collectedNodes;
-    private int collectTopics;
-    private int focusedTopics;
-    private int notification;
+    private String[] balance;
+    private String collectedNodes;
+    private String collectTopics;
+    private String focusedTopics;
+    private String notification;
 
-    public int getNotification() {
+    public String getNotification() {
         return notification;
     }
 
-    public void setNotification(int notification) {
+    public void setNotification(String notification) {
         this.notification = notification;
     }
 
@@ -38,27 +39,35 @@ public class UserProfile implements Serializable{
         this.avatar = avatar;
     }
 
-    public int getCollectedNodes() {
+    public String getCollectedNodes() {
         return collectedNodes;
     }
 
-    public void setCollectedNodes(int collectedNodes) {
+    public void setCollectedNodes(String collectedNodes) {
         this.collectedNodes = collectedNodes;
     }
 
-    public int getCollectTopics() {
+    public String getCollectTopics() {
         return collectTopics;
     }
 
-    public void setCollectTopics(int collectTopics) {
+    public void setCollectTopics(String collectTopics) {
         this.collectTopics = collectTopics;
     }
 
-    public int getFocusedTopics() {
+    public String getFocusedTopics() {
         return focusedTopics;
     }
 
-    public void setFocusedTopics(int focusedTopics) {
+    public void setFocusedTopics(String focusedTopics) {
         this.focusedTopics = focusedTopics;
+    }
+
+    public String[] getBalance() {
+        return balance;
+    }
+
+    public void setBalance(String[] balance) {
+        this.balance = balance;
     }
 }

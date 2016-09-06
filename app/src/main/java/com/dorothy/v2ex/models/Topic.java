@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Created by dorothy on 16/8/5.
  */
 public class Topic implements Serializable {
-    private Integer id;
+    private long id;
     private String title;
     private String url;
     private String content;
@@ -21,14 +21,14 @@ public class Topic implements Serializable {
     /**
      * @return The id
      */
-    public Integer getId() {
+    public long getId() {
         return id;
     }
 
     /**
      * @param id The id
      */
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
     }
 

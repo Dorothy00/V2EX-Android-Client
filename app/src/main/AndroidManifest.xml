@@ -32,6 +32,8 @@
             android:name=".activity.HomeActivity"
             android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".activity.NotificationActivity">
+        </activity>
     </application>
 
 </manifest>

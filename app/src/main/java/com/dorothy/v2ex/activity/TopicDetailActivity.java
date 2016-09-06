@@ -1,5 +1,6 @@
 package com.dorothy.v2ex.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,13 +21,13 @@ import com.bumptech.glide.Glide;
 import com.dorothy.v2ex.R;
 import com.dorothy.v2ex.View.CircleImageView;
 import com.dorothy.v2ex.http.V2EXApiService;
+import com.dorothy.v2ex.http.V2EXHttpClient;
 import com.dorothy.v2ex.interfaces.MemberClickListener;
 import com.dorothy.v2ex.models.Member;
 import com.dorothy.v2ex.models.Reply;
 import com.dorothy.v2ex.models.Topic;
 import com.dorothy.v2ex.utils.V2EXHtmlParser;
 import com.dorothy.v2ex.utils.V2EXImageGetter;
-import com.dorothy.v2ex.utils.V2EXStringConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +48,15 @@ public class TopicDetailActivity extends AppCompatActivity implements MemberClic
     private TextView mTvAuthor;
     private RecyclerView mRvRepliesView;
     private SwipeRefreshLayout mSwipeView;
-    private Topic mTopic;
+    private long mTopicId;
     private List<Reply> mReplyList = new ArrayList<Reply>();
     private RepliesAdapter mRepliesAdapter;
+
+    public static Intent newIntent(Activity activity, long topicId) {
+        Intent intent = new Intent(activity, TopicDetailActivity.class);
+        intent.putExtra("id", topicId);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,18 +85,7 @@ public class TopicDetailActivity extends AppCompatActivity implements MemberClic
 
         Intent intent = getIntent();
         if (intent != null) {
-            mTopic = (Topic) intent.getSerializableExtra("Topic");
-            mTvTitle.setText(mTopic.getTitle());
-            Glide.with(this).load("http:" + mTopic.getMember().getAvatarNormal()).into(mCiAvatar);
-            mTvAuthor.setText(mTopic.getMember().getUsername());
-
-            mCiAvatar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(UserInfoActivity.newIntent(TopicDetailActivity.this, mTopic
-                            .getMember()));
-                }
-            });
+            mTopicId = intent.getLongExtra("id", -1);
 
             mSwipeView.post(new Runnable() {
                 @Override
@@ -103,26 +98,20 @@ public class TopicDetailActivity extends AppCompatActivity implements MemberClic
     }
 
     private void fetchTopic(long topicId) {
-        if (mTopic == null)
+        if (mTopicId < 0)
             return;
 
-        if (!TextUtils.isEmpty(mTopic.getContent())) {
-            renderContent();
-            fetchTopicReplies(mTopic.getId());
-            return;
-        }
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(V2EXApiService.BASE_URL)
-                .addConverterFactory(V2EXStringConverter.create()).build();
+        Retrofit retrofit = V2EXHttpClient.retrofit(this);
         V2EXApiService apiService = retrofit.create(V2EXApiService.class);
         Call<String> call = apiService.getTopicById(topicId);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response != null && response.isSuccessful()) {
-                    String contentRendered = V2EXHtmlParser.parseTopicContent(response.body());
-                    mTopic.setContentRendered(contentRendered);
-                    renderContent();
-                    fetchTopicReplies(mTopic.getId());
+                    Topic topic = V2EXHtmlParser.parseTopic(response.body());
+                    renderContent(topic);
+                    fetchTopicReplies(mTopicId);
+
                 } else {
                     //TODO
                 }
@@ -165,14 +154,26 @@ public class TopicDetailActivity extends AppCompatActivity implements MemberClic
         });
     }
 
-    private void renderContent() {
+    private void renderContent(final Topic topic) {
         V2EXImageGetter v2exImageParser = new V2EXImageGetter(mTvContent,
                 TopicDetailActivity.this);
 
-        mTvContent.setText(Html.fromHtml(mTopic.getContentRendered() + " ",
+        mTvContent.setText(Html.fromHtml(topic.getContentRendered() + " ",
                 v2exImageParser,
                 null));
         mTvContent.setMovementMethod(LinkMovementMethod.getInstance());
+        mTvAuthor.setText(topic.getMember().getUsername());
+        mTvTitle.setText(topic.getTitle());
+        Glide.with(this).load("http:" + topic.getMember().getAvatarLarge()).into(mCiAvatar);
+        if (!mCiAvatar.hasOnClickListeners()) {
+            mCiAvatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(UserInfoActivity.newIntent(TopicDetailActivity.this, topic
+                            .getMember()));
+                }
+            });
+        }
     }
 
     @Override
@@ -182,7 +183,7 @@ public class TopicDetailActivity extends AppCompatActivity implements MemberClic
 
     @Override
     public void onRefresh() {
-        fetchTopic(mTopic.getId());
+        fetchTopic(mTopicId);
     }
 
     public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.ReplyViewHolder> {

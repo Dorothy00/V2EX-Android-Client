@@ -52,4 +52,7 @@ public interface V2EXApiService {
     @GET("/")
     Call<String> getUserProfile();
 
+    @GET("/notifications")
+    Call<String> getNotification();
+
 }

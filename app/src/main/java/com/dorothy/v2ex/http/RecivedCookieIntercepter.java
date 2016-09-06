@@ -33,9 +33,14 @@ public class RecivedCookieIntercepter implements Interceptor {
         List<String> cookies = response.headers().values("Set-Cookie");
         StringBuilder sb = new StringBuilder();
         sb.append(oldCookie);
-        for (String cookie : cookies) {
-            sb.append(cookie + ";");
+        if(oldCookie.contains("V2EX_LANG")){
+            sb.append(cookies.get(0) + ";");
+        }else{
+            for (String cookie : cookies) {
+                sb.append(cookie + ";");
+            }
         }
+
         V2EXCookieManager.storeCookie(context, sb.toString());
 
         return response;

@@ -2,7 +2,6 @@ package com.dorothy.v2ex.fragment;
 
 
 import android.app.Fragment;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -190,9 +189,7 @@ public class TopicListFragment extends Fragment implements TopicOnItemClickListe
 
     @Override
     public void onItemClick(Topic topic) {
-        Intent intent = new Intent(getActivity(), TopicDetailActivity.class);
-        intent.putExtra("Topic", topic);
-        startActivity(intent);
+        startActivity(TopicDetailActivity.newIntent(getActivity(), topic.getId()));
     }
 
     @Override

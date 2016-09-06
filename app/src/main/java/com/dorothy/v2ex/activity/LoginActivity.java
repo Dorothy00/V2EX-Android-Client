@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,13 +37,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-           V2EXCookieManager.clearCookie(this);
-        if (!V2EXCookieManager.isEXpired(this)) {
-            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-            startActivity(intent);
-            finish();
-            return;
-        }
+        V2EXCookieManager.clearCookie(this);
+//        if (2==2) {
+//            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+//            startActivity(intent);
+//            finish();
+//            return;
+//        }
 
         mEtUsername = (EditText) findViewById(R.id.username);
         mEtPassword = (EditText) findViewById(R.id.password);
@@ -165,12 +164,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                     startActivity(intent);
                     finish();
+                } else {
+                    //TODO
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-
+                //TODO
             }
         });
     }
