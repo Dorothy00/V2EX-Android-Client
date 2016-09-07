@@ -37,13 +37,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        V2EXCookieManager.clearCookie(this);
-//        if (2==2) {
-//            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-//            startActivity(intent);
-//            finish();
-//            return;
-//        }
+      //  V2EXCookieManager.clearCookie(this);
+        if (2==2) {
+            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
         mEtUsername = (EditText) findViewById(R.id.username);
         mEtPassword = (EditText) findViewById(R.id.password);

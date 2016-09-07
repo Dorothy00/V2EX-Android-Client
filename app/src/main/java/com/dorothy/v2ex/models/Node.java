@@ -13,9 +13,6 @@ public class Node implements Serializable {
     private String titleAlternative;
     private String url;
     private Integer topics;
-    private String avatarMini;
-    private String avatarNormal;
-    private String avatarLarge;
 
     /**
      * @return The id
@@ -101,47 +98,6 @@ public class Node implements Serializable {
         this.topics = topics;
     }
 
-    /**
-     * @return The avatarMini
-     */
-    public String getAvatarMini() {
-        return avatarMini;
-    }
-
-    /**
-     * @param avatarMini The avatar_mini
-     */
-    public void setAvatarMini(String avatarMini) {
-        this.avatarMini = avatarMini;
-    }
-
-    /**
-     * @return The avatarNormal
-     */
-    public String getAvatarNormal() {
-        return avatarNormal;
-    }
-
-    /**
-     * @param avatarNormal The avatar_normal
-     */
-    public void setAvatarNormal(String avatarNormal) {
-        this.avatarNormal = avatarNormal;
-    }
-
-    /**
-     * @return The avatarLarge
-     */
-    public String getAvatarLarge() {
-        return avatarLarge;
-    }
-
-    /**
-     * @param avatarLarge The avatar_large
-     */
-    public void setAvatarLarge(String avatarLarge) {
-        this.avatarLarge = avatarLarge;
-    }
 
 }
 

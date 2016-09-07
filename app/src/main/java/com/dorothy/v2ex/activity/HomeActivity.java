@@ -5,28 +5,33 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
 import com.dorothy.v2ex.R;
+import com.dorothy.v2ex.fragment.AllNodeFragment;
 import com.dorothy.v2ex.fragment.TopicFragment;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
-
-    public static final String TOPICFRAGMENT_TAG = "topic";
-    public static final String PROFILEFRAGMENT_TAG = "profile";
 
     private TextView mTvHome;
     private TextView mTvNode;
     private TextView mTvMy;
     private TopicFragment mTopicFragment;
-    private ProfileFragment profileFragment;
+    private ProfileFragment mProfileFragment;
+    private AllNodeFragment mAllNodeFragment;
     private Fragment mCurFragment;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar.setTitle("");
+        setSupportActionBar(mToolbar);
 
         mTvHome = (TextView) findViewById(R.id.home);
         mTvNode = (TextView) findViewById(R.id.node);
@@ -37,7 +42,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             mTopicFragment = TopicFragment.newInstance();
         }
         mCurFragment = mTopicFragment;
-        ft.add(R.id.fragment, mTopicFragment, TOPICFRAGMENT_TAG);
+        ft.add(R.id.fragment, mTopicFragment);
         ft.commit();
 
 
@@ -52,30 +57,38 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        if (v.getId() == R.id.home) {
+        int id = v.getId();
+        if (id == R.id.home) {
             if (mTopicFragment == null) {
                 mTopicFragment = TopicFragment.newInstance();
                 ft.hide(mCurFragment);
-                ft.add(R.id.fragment, mTopicFragment, TOPICFRAGMENT_TAG);
-                ft.commit();
+                ft.add(R.id.fragment, mTopicFragment);
             } else if (mTopicFragment.isAdded() && mCurFragment != mTopicFragment) {
                 ft.hide(mCurFragment);
                 ft.show(mTopicFragment);
-                ft.commit();
             }
             mCurFragment = mTopicFragment;
-        } else if (v.getId() == R.id.node || v.getId() == R.id.my) {
-            if (profileFragment == null) {
-                profileFragment = new ProfileFragment();
+        } else if (id == R.id.my) {
+            if (mProfileFragment == null) {
+                mProfileFragment = new ProfileFragment();
                 ft.hide(mCurFragment);
-                ft.add(R.id.fragment, profileFragment, PROFILEFRAGMENT_TAG);
-                ft.commit();
-            } else if (profileFragment.isAdded() && mCurFragment != profileFragment) {
+                ft.add(R.id.fragment, mProfileFragment);
+            } else if (mProfileFragment.isAdded() && mCurFragment != mProfileFragment) {
                 ft.hide(mCurFragment);
-                ft.show(profileFragment);
-                ft.commit();
+                ft.show(mProfileFragment);
             }
-            mCurFragment = profileFragment;
+            mCurFragment = mProfileFragment;
+        } else if (id == R.id.node) {
+            if (mAllNodeFragment == null) {
+                mAllNodeFragment = new AllNodeFragment();
+                ft.hide(mCurFragment);
+                ft.add(R.id.fragment, mAllNodeFragment);
+            } else if (mAllNodeFragment.isAdded() && mCurFragment != mAllNodeFragment) {
+                ft.hide(mCurFragment);
+                ft.show(mAllNodeFragment);
+            }
+            mCurFragment = mAllNodeFragment;
         }
+        ft.commit();
     }
 }

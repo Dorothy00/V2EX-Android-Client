@@ -58,6 +58,9 @@ public class V2EXImageGetter implements Html.ImageGetter {
 
         @Override
         protected void onPostExecute(Drawable result) {
+            if (result == null) {
+                return;
+            }
             urlDrawable.setBounds(0, 0, 0 + result.getIntrinsicWidth(), 0
                     + result.getIntrinsicHeight());
             urlDrawable.drawable = result;

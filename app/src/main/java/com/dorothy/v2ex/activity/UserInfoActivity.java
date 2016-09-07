@@ -20,9 +20,9 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.dorothy.v2ex.R;
 import com.dorothy.v2ex.View.CircleImageView;
+import com.dorothy.v2ex.adapter.BaseRecyclerAdapter;
 import com.dorothy.v2ex.adapter.TopicsAdapter;
 import com.dorothy.v2ex.http.V2EXApiService;
-import com.dorothy.v2ex.interfaces.TopicOnItemClickListener;
 import com.dorothy.v2ex.models.Member;
 import com.dorothy.v2ex.models.MemberDetail;
 import com.dorothy.v2ex.models.Topic;
@@ -37,7 +37,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class UserInfoActivity extends AppCompatActivity implements TopicOnItemClickListener {
+public class UserInfoActivity extends AppCompatActivity implements BaseRecyclerAdapter
+        .OnItemClickListener {
 
     private Member member;
     private MemberDetail memberDetail;
@@ -70,7 +71,8 @@ public class UserInfoActivity extends AppCompatActivity implements TopicOnItemCl
         mIvHomeArrow = (ImageView) findViewById(R.id.home_arrow);
         mIvGithubArrow = (ImageView) findViewById(R.id.github_arrow);
         mRvTopics = (RecyclerView) findViewById(R.id.topics);
-        mTopicsAdapter = new TopicsAdapter(this, mTopicList, this);
+        mTopicsAdapter = new TopicsAdapter(this, mTopicList);
+        mTopicsAdapter.setOnItemClickListener(this);
 
         Intent intent = getIntent();
         member = (Member) intent.getSerializableExtra("member");
@@ -146,9 +148,10 @@ public class UserInfoActivity extends AppCompatActivity implements TopicOnItemCl
                     // Html 解析得不到数据的情况
                     Glide.with(UserInfoActivity.this).load("http:" + memberDetail.getAvatarLarge())
                             .into(mCiAvatar);
-                    mTvV2exInfo.setText(getString(R.string.member_number).replace("{id}", memberDetail
-                            .getId()
-                            + ""));
+                    mTvV2exInfo.setText(getString(R.string.member_number).replace("{id}",
+                            memberDetail
+                                    .getId()
+                                    + ""));
 
                     fetchUserTopics(memberDetail.getUsername());
                 } else {
@@ -197,10 +200,9 @@ public class UserInfoActivity extends AppCompatActivity implements TopicOnItemCl
     }
 
     @Override
-    public void onItemClick(Topic topic) {
-        Intent intent = new Intent(this, TopicDetailActivity.class);
-        intent.putExtra("Topic", topic);
-        startActivity(intent);
+    public void onItemClick(int pos) {
+        Topic topic = mTopicList.get(pos);
+        startActivity(TopicDetailActivity.newIntent(this, topic.getId()));
     }
 
     public static Intent newIntent(Activity activity, Member member) {

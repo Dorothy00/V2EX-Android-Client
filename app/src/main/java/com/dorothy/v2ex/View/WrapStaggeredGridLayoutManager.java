@@ -1,30 +1,23 @@
 package com.dorothy.v2ex.View;
 
-/**
- * Created by dorothy on 16/9/2.
- */
-
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
 import android.util.Log;
 
 /**
- * Created by Asus on 2016/5/17.
+ * Created by dorothy on 16/9/7.
  */
-public class WrapContentLinearLayoutManager extends LinearLayoutManager {
-    public WrapContentLinearLayoutManager(Context context) {
-        super(context);
-    }
+public class WrapStaggeredGridLayoutManager extends StaggeredGridLayoutManager {
 
-    public WrapContentLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
-        super(context, orientation, reverseLayout);
-    }
-
-    public WrapContentLinearLayoutManager(Context context, AttributeSet attrs, int defStyleAttr,
+    public WrapStaggeredGridLayoutManager(Context context, AttributeSet attrs, int defStyleAttr,
                                           int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+    }
+
+    public WrapStaggeredGridLayoutManager(int spanCount, int orientation) {
+        super(spanCount, orientation);
     }
 
     @Override
@@ -35,6 +28,4 @@ public class WrapContentLinearLayoutManager extends LinearLayoutManager {
             Log.e("problem", "meet a IOOBE in RecyclerView");
         }
     }
-
-
 }

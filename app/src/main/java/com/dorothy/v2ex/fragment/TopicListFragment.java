@@ -13,12 +13,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.dorothy.v2ex.R;
-import com.dorothy.v2ex.View.WrapContentLinearLayoutManager;
+import com.dorothy.v2ex.View.WrapLinearLayoutManager;
 import com.dorothy.v2ex.activity.TopicDetailActivity;
+import com.dorothy.v2ex.adapter.BaseRecyclerAdapter;
 import com.dorothy.v2ex.adapter.TopicsAdapter;
 import com.dorothy.v2ex.http.V2EXApiService;
 import com.dorothy.v2ex.http.V2EXHttpClient;
-import com.dorothy.v2ex.interfaces.TopicOnItemClickListener;
 import com.dorothy.v2ex.models.Topic;
 import com.dorothy.v2ex.utils.V2EXHtmlParser;
 import com.dorothy.v2ex.utils.V2EXStringConverter;
@@ -35,7 +35,7 @@ import retrofit2.Retrofit;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TopicListFragment extends Fragment implements TopicOnItemClickListener,
+public class TopicListFragment extends Fragment implements BaseRecyclerAdapter.OnItemClickListener,
         SwipeRefreshLayout.OnRefreshListener {
     public static final String TOPIC_TYPE = "topic_type";
     public static final String TOPIC_HOT = "hot";
@@ -74,8 +74,9 @@ public class TopicListFragment extends Fragment implements TopicOnItemClickListe
         View view = inflater.inflate(R.layout.fragment_topic_list, container, false);
         mRvTopicsView = (RecyclerView) view.findViewById(R.id.topic_list);
         mSwipeView = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
-        mRvTopicsView.setLayoutManager(new WrapContentLinearLayoutManager(getActivity()));
-        mTopicsAdapter = new TopicsAdapter(getActivity(), mTopicList, TopicListFragment.this);
+        mRvTopicsView.setLayoutManager(new WrapLinearLayoutManager(getActivity()));
+        mTopicsAdapter = new TopicsAdapter(getActivity(), mTopicList);
+        mTopicsAdapter.setOnItemClickListener(this);
         mRvTopicsView.setAdapter(mTopicsAdapter);
         mSwipeView.setDistanceToTriggerSync(300);
         mSwipeView.setColorSchemeColors(Color.RED);
@@ -187,10 +188,6 @@ public class TopicListFragment extends Fragment implements TopicOnItemClickListe
         mIsFirstTime = false;
     }
 
-    @Override
-    public void onItemClick(Topic topic) {
-        startActivity(TopicDetailActivity.newIntent(getActivity(), topic.getId()));
-    }
 
     @Override
     public void onRefresh() {
@@ -199,5 +196,11 @@ public class TopicListFragment extends Fragment implements TopicOnItemClickListe
         } else {
             fetchTopicsByTag(mType);
         }
+    }
+
+    @Override
+    public void onItemClick(int pos) {
+        Topic topic = mTopicList.get(pos);
+        startActivity(TopicDetailActivity.newIntent(getActivity(), topic.getId()));
     }
 }

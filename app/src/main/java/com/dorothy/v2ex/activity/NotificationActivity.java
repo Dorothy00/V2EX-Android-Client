@@ -1,5 +1,6 @@
 package com.dorothy.v2ex.activity;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -7,13 +8,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.dorothy.v2ex.R;
-import com.dorothy.v2ex.View.WrapContentLinearLayoutManager;
-import com.dorothy.v2ex.adapter.NotificationAdapter;
+import com.dorothy.v2ex.View.CircleImageView;
+import com.dorothy.v2ex.View.WrapLinearLayoutManager;
+import com.dorothy.v2ex.adapter.BaseRecyclerAdapter;
+import com.dorothy.v2ex.adapter.RecyclerViewHolder;
 import com.dorothy.v2ex.http.V2EXApiService;
 import com.dorothy.v2ex.http.V2EXHttpClient;
-import com.dorothy.v2ex.interfaces.NotifyItemClickListener;
 import com.dorothy.v2ex.models.Notification;
 import com.dorothy.v2ex.utils.V2EXHtmlParser;
 
@@ -26,12 +30,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class NotificationActivity extends AppCompatActivity implements SwipeRefreshLayout
-        .OnRefreshListener, NotifyItemClickListener {
+        .OnRefreshListener, BaseRecyclerAdapter.OnItemClickListener {
 
     private Toolbar mToolbar;
     private RecyclerView mRvNotification;
     private SwipeRefreshLayout mSwipeView;
-    private NotificationAdapter mAdapter;
+    private NotifyAdapter mAdapter;
     private List<Notification> mNotifyList = new ArrayList<>();
 
     @Override
@@ -50,8 +54,9 @@ public class NotificationActivity extends AppCompatActivity implements SwipeRefr
         mSwipeView.setDistanceToTriggerSync(300);
 
         mRvNotification = (RecyclerView) findViewById(R.id.recycle_view);
-        mRvNotification.setLayoutManager(new WrapContentLinearLayoutManager(this));
-        mAdapter = new NotificationAdapter(this, this, mNotifyList);
+        mRvNotification.setLayoutManager(new WrapLinearLayoutManager(this));
+        mAdapter = new NotifyAdapter(this, mNotifyList);
+        mAdapter.setOnItemClickListener(this);
         mRvNotification.setAdapter(mAdapter);
 
         mSwipeView.post(new Runnable() {
@@ -108,7 +113,36 @@ public class NotificationActivity extends AppCompatActivity implements SwipeRefr
     }
 
     @Override
-    public void notifyItemOnClick(Notification notification) {
+    public void onItemClick(int pos) {
+        Notification notification = mNotifyList.get(pos);
         startActivity(TopicDetailActivity.newIntent(this, notification.getTopicId()));
+    }
+
+
+    class NotifyAdapter extends BaseRecyclerAdapter<Notification> {
+
+        public NotifyAdapter(Context context, List<Notification> dataList) {
+            super(context, dataList);
+        }
+
+        @Override
+        public void bindData(RecyclerViewHolder viewHolder, Notification data, int position) {
+            CircleImageView ciAvatar = viewHolder.getCircleImageView(R.id.avatar);
+            TextView tvTitle = viewHolder.getTextView(R.id.title);
+            TextView tvReplyContent = viewHolder.getTextView(R.id.reply_content);
+            TextView tvTime = viewHolder.getTextView(R.id.reply_time);
+
+            Notification notification = mNotifyList.get(position);
+            Glide.with(context).load("http:" + notification.getMember().getAvatarMini()).into
+                    (ciAvatar);
+            tvTitle.setText(notification.getReplyTitle());
+            tvReplyContent.setText(notification.getReplyContent());
+            tvTime.setText(notification.getTime());
+        }
+
+        @Override
+        public int getLayoutResId() {
+            return R.layout.item_notification;
+        }
     }
 }

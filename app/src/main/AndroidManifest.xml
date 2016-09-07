@@ -34,6 +34,10 @@
         </activity>
         <activity android:name=".activity.NotificationActivity">
         </activity>
+        <activity android:name=".fragment.AllNodeFragment">
+        </activity>
+        <activity android:name=".activity.NodeTopicsActivity">
+        </activity>
     </application>
 
 </manifest>

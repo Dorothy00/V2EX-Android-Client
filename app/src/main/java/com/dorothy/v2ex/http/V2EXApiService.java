@@ -1,6 +1,7 @@
 package com.dorothy.v2ex.http;
 
 import com.dorothy.v2ex.models.MemberDetail;
+import com.dorothy.v2ex.models.NodeDetail;
 import com.dorothy.v2ex.models.Reply;
 import com.dorothy.v2ex.models.Topic;
 
@@ -26,6 +27,9 @@ public interface V2EXApiService {
 
     @GET("api/topics/show.json")
     Call<List<Topic>> getTopicsByUsername(@Query("username") String username);
+
+    @GET("api/topics/show.json")
+    Call<List<Topic>> getTopicsByNode(@Query("node_name") String nodeName);
 
     @GET("api/topics/hot.json")
     Call<List<Topic>> getHotTopics();
@@ -54,5 +58,8 @@ public interface V2EXApiService {
 
     @GET("/notifications")
     Call<String> getNotification();
+
+    @GET("/api/nodes/all.json")
+    Call<List<NodeDetail>> getAllNodes();
 
 }

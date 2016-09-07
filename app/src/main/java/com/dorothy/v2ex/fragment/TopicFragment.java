@@ -6,6 +6,7 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,13 +29,6 @@ public class TopicFragment extends Fragment {
 
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_topic, container, false);
@@ -46,10 +40,15 @@ public class TopicFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.getSupportActionBar().setTitle("首页");
+        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    }
 
-
-
-        class TopicTabPagerAdapter extends FragmentPagerAdapter {
+    class TopicTabPagerAdapter extends FragmentPagerAdapter {
         private final String[] CONTENT = new String[]{"技术", "创意", "好玩", "Apple", "酷工作", "交易",
                 "城市", "问与答", "最热", "全部", "R2", "关注"};
 

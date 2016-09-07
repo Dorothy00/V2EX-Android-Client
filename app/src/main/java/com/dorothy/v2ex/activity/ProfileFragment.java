@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,6 @@ import com.dorothy.v2ex.utils.UserCache;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
-    private Toolbar mToolbar;
     private CircleImageView mCiAvatar;
     private TextView mTvUsername;
     private TextView mTvNode;
@@ -35,9 +33,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable
     Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
-
-        mToolbar = (Toolbar) root.findViewById(R.id.toolbar);
-        mToolbar.setTitle("");
 
         mCiAvatar = (CircleImageView) root.findViewById(R.id.avatar);
         mTvUsername = (TextView) root.findViewById(R.id.username);
@@ -56,12 +51,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.setSupportActionBar(mToolbar);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         UserProfile userProfile = UserCache.getUser(getActivity());
         if (userProfile != null) {
-            mToolbar.setTitle(userProfile.getUsername());
+            activity.getSupportActionBar().setTitle(userProfile.getUsername());
             Glide.with(getActivity()).load("http:" + userProfile.getAvatar()).into(mCiAvatar);
             mTvUsername.setText(userProfile.getUsername());
             mTvNode.setText(userProfile.getCollectedNodes());
