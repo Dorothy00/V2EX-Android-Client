@@ -13,7 +13,7 @@ public class UserCache {
     private static final String USER_KEY = "user";
     private static final String PROFILE_KEY = "profile";
 
-    public static void userCatch(Context context, UserProfile userProfile) {
+    public static void userCache(Context context, UserProfile userProfile) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(USER_KEY, Context
                 .MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -27,5 +27,13 @@ public class UserCache {
         String profileStr = sharedPreferences.getString(PROFILE_KEY, "");
         UserProfile userProfile = new Gson().fromJson(profileStr, UserProfile.class);
         return userProfile;
+    }
+
+    public static void clearUserCache(Context context){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(USER_KEY, Context
+                .MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
     }
 }

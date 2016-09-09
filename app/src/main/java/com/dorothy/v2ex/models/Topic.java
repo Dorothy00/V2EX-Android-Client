@@ -17,6 +17,15 @@ public class Topic implements Serializable {
     private Integer created;
     private Integer lastModified;
     private Integer lastTouched;
+    private String once;
+
+    public String getOnce() {
+        return once;
+    }
+
+    public void setOnce(String once) {
+        this.once = once;
+    }
 
     /**
      * @return The id

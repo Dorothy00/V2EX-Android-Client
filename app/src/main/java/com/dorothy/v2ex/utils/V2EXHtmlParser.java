@@ -1,11 +1,11 @@
 package com.dorothy.v2ex.utils;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.dorothy.v2ex.models.Member;
 import com.dorothy.v2ex.models.Node;
 import com.dorothy.v2ex.models.Notification;
+import com.dorothy.v2ex.models.Reply;
 import com.dorothy.v2ex.models.Topic;
 import com.dorothy.v2ex.models.UserProfile;
 
@@ -91,19 +91,40 @@ public class V2EXHtmlParser {
         Elements contentElements = elements.select("div[class=topic_content]").select
                 ("div[class=markdown_body]");
         String content = contentElements.html();
+        if(TextUtils.isEmpty(content)){
+            content = elements.select("div[class=topic_content]").html();
+        }
         topic.setContentRendered(content);
+
+        String once = elements.select("form[method=post]").select("input[name=once]").attr("value");
+        topic.setOnce(once);
 
         return topic;
     }
 
-    public static String parseTopicContent(String htmlStr) {
+    public static List<Reply> parseReply(String htmlStr) {
+        List<Reply> replyList = new ArrayList<>();
         Document document = Jsoup.parse(htmlStr);
-        Elements elements = document.select("div[class=markdown_body]");
-        if (elements.size() == 0) {
-            elements = document.select("div[class=topic_content]");
+        Elements elements = document.select("div[id=Main]");
+
+        Elements replyElements = elements.select("div[class=box]").get(1).select("div[id~=^r_]");
+        for (Element element : replyElements) {
+            Reply reply = new Reply();
+            Member member = new Member();
+            reply.setMember(member);
+
+            String avatar = element.select("img[src~=^//]").attr("src");
+            member.setAvatarNormal(avatar);
+            String username = element.select("a[href~=^/member/]").text();
+            member.setUsername(username);
+            String replyContent = element.select("div[class=reply_content]").html();
+            reply.setContentRendered(replyContent);
+            String thanks = element.select("span[class=no]").text();
+            reply.setThanks(Integer.valueOf(thanks));
+            replyList.add(reply);
         }
-        String content = elements.html();
-        return content;
+
+        return replyList;
     }
 
     public static String[] parseLoginField(String htmlStr) {

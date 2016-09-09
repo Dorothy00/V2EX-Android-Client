@@ -37,7 +37,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-      //  V2EXCookieManager.clearCookie(this);
+    //    V2EXCookieManager.clearCookie(this);
         if (2==2) {
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
@@ -160,7 +160,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response != null && response.isSuccessful()) {
                     UserProfile userProfile = V2EXHtmlParser.parseUserProfile(response.body());
-                    UserCache.userCatch(LoginActivity.this, userProfile);
+                    UserCache.userCache(LoginActivity.this, userProfile);
                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                     startActivity(intent);
                     finish();

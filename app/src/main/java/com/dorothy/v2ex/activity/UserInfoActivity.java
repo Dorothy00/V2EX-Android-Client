@@ -74,6 +74,7 @@ public class UserInfoActivity extends AppCompatActivity implements BaseRecyclerA
         mTopicsAdapter = new TopicsAdapter(this, mTopicList);
         mTopicsAdapter.setOnItemClickListener(this);
 
+
         Intent intent = getIntent();
         member = (Member) intent.getSerializableExtra("member");
         if (member == null)
@@ -118,7 +119,7 @@ public class UserInfoActivity extends AppCompatActivity implements BaseRecyclerA
         call.enqueue(new Callback<MemberDetail>() {
             @Override
             public void onResponse(Call<MemberDetail> call, Response<MemberDetail> response) {
-                if (response.code() == 200) {
+                if (response!= null && response.isSuccessful()) {
                     memberDetail = response.body();
                     String homeInfo = memberDetail.getWebsite();
                     String githubInfo = memberDetail.getGithub();

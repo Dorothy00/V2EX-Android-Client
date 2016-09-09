@@ -62,4 +62,8 @@ public interface V2EXApiService {
     @GET("/api/nodes/all.json")
     Call<List<NodeDetail>> getAllNodes();
 
+    @FormUrlEncoded
+    @POST("/t/{id}")
+    Call<String> commentTopic(@Path("id") long id, @FieldMap Map<String, String> params);
+
 }

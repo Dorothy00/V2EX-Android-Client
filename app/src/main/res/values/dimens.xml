@@ -53,4 +53,5 @@
     <dimen name="margin20">40dp</dimen>
     <dimen name="margin30">60dp</dimen>
     <dimen name="margin40">80dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

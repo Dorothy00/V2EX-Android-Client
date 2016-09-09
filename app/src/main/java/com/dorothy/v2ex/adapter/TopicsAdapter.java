@@ -28,11 +28,10 @@ public class TopicsAdapter extends BaseRecyclerAdapter<Topic> {
         TextView tvReplyNum = viewHolder.getTextView(R.id.reply_number);
         CircleImageView ivAvatar = viewHolder.getCircleImageView(R.id.avatar);
 
-        Topic topic = dataList.get(position);
-        tvTitle.setText(topic.getTitle());
-        tvAuthor.setText(topic.getMember().getUsername());
-        tvReplyNum.setText(topic.getReplies() + "");
-        Glide.with(context).load("http:" + topic.getMember().getAvatarNormal())
+        tvTitle.setText(data.getTitle());
+        tvAuthor.setText(data.getMember().getUsername());
+        tvReplyNum.setText(data.getReplies() + "");
+        Glide.with(context).load("http:" + data.getMember().getAvatarNormal())
                 .into(ivAvatar);
     }
 

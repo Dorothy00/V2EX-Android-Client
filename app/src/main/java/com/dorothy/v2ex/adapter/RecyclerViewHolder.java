@@ -59,10 +59,6 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder {
         return (EditText) getView(viewId);
     }
 
-    public void setText(int viewId, String text) {
-        TextView textView = findViewById(viewId);
-        textView.setText(text);
-    }
 
     public void setOnClickListener(int viewId, View.OnClickListener listener) {
         View view = findViewById(viewId);
