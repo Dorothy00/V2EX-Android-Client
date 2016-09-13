@@ -22,11 +22,19 @@ import java.util.List;
  */
 public class V2EXHtmlParser {
 
-    public static List<Topic> parseTopicList(String htmlStr) {
-        List<Topic> topicList = new ArrayList<Topic>();
+    public static final int FROM_TAB = 1;    // 从首页进入
+    public static final int FROM_NODE = 2;   // 从节点进入
+
+    public static List<Topic> parseTopicList(String htmlStr, int from) {
+        List<Topic> topicList = new ArrayList<>();
 
         Document document = Jsoup.parse(htmlStr);
-        Elements elements = document.select("div[class~=cell item]");
+        Elements elements;
+        if (from == FROM_TAB) {
+            elements = document.select("div[class~=cell item]");
+        } else {
+            elements = document.select("div[id=TopicsNode]").select("div[class~=cell]");
+        }
         for (Element element : elements) {
             Topic topic = new Topic();
             Member member = new Member();
@@ -54,20 +62,35 @@ public class V2EXHtmlParser {
                 int end = topicLink.indexOf("#");
                 topic.setId(Integer.valueOf(topicLink.substring(start, end)));
             }
-            String nodeStr = childElement3.getElementsByClass("node").text();
-            node.setName(nodeStr);
+            if (from == FROM_TAB) {
+                String nodeTitleStr = childElement3.getElementsByClass("node").text();
+                node.setTitle(nodeTitleStr);
+                String nodeNameStr = childElement3.getElementsByClass("node").attr("href");
+                node.setName(nodeNameStr.substring("/go/".length()));
+            }
+
 
             Element childElement4 = childElements.get(3);
-            String replyCount = childElement4.getElementsByClass("count_livid").text();
-            if (TextUtils.isEmpty(replyCount)) {
-                replyCount = "0";
+            Elements countElements = childElement4.getElementsByClass("count_livid");
+            String replyCount = "0";
+            if (countElements.size() > 0) {
+                replyCount = childElement4.getElementsByClass("count_livid").text();
+                if (TextUtils.isEmpty(replyCount)) {
+                    replyCount = "0";
+                }
             }
             topic.setReplies(Integer.valueOf(replyCount));
 
             topicList.add(topic);
-
         }
         return topicList;
+    }
+
+    public static String parseCollectUrl(String htmlStr) {
+        Document document = Jsoup.parse(htmlStr);
+        Elements elements = document.select("div[id=Main]").select("div[class=header]");
+        Elements urlElements = elements.select("div[class~=fr]").select("a");
+        return urlElements.attr("href");
     }
 
     public static Topic parseTopic(String htmlStr) {
@@ -91,7 +114,7 @@ public class V2EXHtmlParser {
         Elements contentElements = elements.select("div[class=topic_content]").select
                 ("div[class=markdown_body]");
         String content = contentElements.html();
-        if(TextUtils.isEmpty(content)){
+        if (TextUtils.isEmpty(content)) {
             content = elements.select("div[class=topic_content]").html();
         }
         topic.setContentRendered(content);
@@ -234,6 +257,28 @@ public class V2EXHtmlParser {
 
         }
         return notifications;
+    }
+
+    public static List<Node> parseCollectedNode(String htmlStr) {
+        List<Node> nodeList = new ArrayList<>();
+        Document document = Jsoup.parse(htmlStr);
+        Elements nodeElements = document.select("div[id=MyNodes]").select("a[class=grid_item]");
+        for (Element element : nodeElements) {
+            Node node = new Node();
+            String name = element.attr("href");
+            if (name.startsWith("/go/")) {
+                node.setName(name.substring("/go/".length()));
+            }
+            String imgUrl = element.select("img").attr("src");
+            node.setImgUrl(imgUrl);
+            String[] titleAndNum = element.text().split(" ");
+            if (titleAndNum.length < 2)
+                continue;
+            node.setTitle(titleAndNum[0]);
+            node.setTopics(Integer.valueOf(titleAndNum[1]));
+            nodeList.add(node);
+        }
+        return nodeList;
     }
 
 }

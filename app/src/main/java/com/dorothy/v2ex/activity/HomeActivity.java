@@ -7,22 +7,26 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import com.dorothy.v2ex.R;
 import com.dorothy.v2ex.fragment.AllNodeFragment;
+import com.dorothy.v2ex.fragment.ProfileFragment;
 import com.dorothy.v2ex.fragment.TopicFragment;
+import com.dorothy.v2ex.models.UserProfile;
+import com.dorothy.v2ex.utils.UserCache;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private TextView mTvHome;
-    private TextView mTvNode;
-    private TextView mTvMy;
+    private ImageView mIvHome;
+    private ImageView mIvNode;
+    private ImageView mIvMy;
     private TopicFragment mTopicFragment;
     private ProfileFragment mProfileFragment;
     private AllNodeFragment mAllNodeFragment;
     private Fragment mCurFragment;
     private Toolbar mToolbar;
+    private UserProfile userProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,25 +34,26 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mToolbar.setTitle("");
+        mToolbar.setTitle("首页");
         setSupportActionBar(mToolbar);
 
-        mTvHome = (TextView) findViewById(R.id.home);
-        mTvNode = (TextView) findViewById(R.id.node);
-        mTvMy = (TextView) findViewById(R.id.my);
+        mIvHome = (ImageView) findViewById(R.id.home);
+        mIvNode = (ImageView) findViewById(R.id.node);
+        mIvMy = (ImageView) findViewById(R.id.my);
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         if (mTopicFragment == null) {
-            mTopicFragment = TopicFragment.newInstance();
+            mTopicFragment = new TopicFragment();
         }
         mCurFragment = mTopicFragment;
         ft.add(R.id.fragment, mTopicFragment);
         ft.commit();
+        mIvHome.setBackgroundResource(R.drawable.ic_home_primary);
 
 
-        mTvHome.setOnClickListener(this);
-        mTvNode.setOnClickListener(this);
-        mTvMy.setOnClickListener(this);
+        mIvHome.setOnClickListener(this);
+        mIvNode.setOnClickListener(this);
+        mIvMy.setOnClickListener(this);
 
     }
 
@@ -60,7 +65,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         int id = v.getId();
         if (id == R.id.home) {
             if (mTopicFragment == null) {
-                mTopicFragment = TopicFragment.newInstance();
+                mTopicFragment = new TopicFragment();
                 ft.hide(mCurFragment);
                 ft.add(R.id.fragment, mTopicFragment);
             } else if (mTopicFragment.isAdded() && mCurFragment != mTopicFragment) {
@@ -68,15 +73,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 ft.show(mTopicFragment);
             }
             mCurFragment = mTopicFragment;
+            getSupportActionBar().setTitle("首页");
         } else if (id == R.id.my) {
             if (mProfileFragment == null) {
                 mProfileFragment = new ProfileFragment();
                 ft.hide(mCurFragment);
                 ft.add(R.id.fragment, mProfileFragment);
+                userProfile = UserCache.getUser(this);
             } else if (mProfileFragment.isAdded() && mCurFragment != mProfileFragment) {
                 ft.hide(mCurFragment);
                 ft.show(mProfileFragment);
             }
+            getSupportActionBar().setTitle(userProfile.getUsername());
             mCurFragment = mProfileFragment;
         } else if (id == R.id.node) {
             if (mAllNodeFragment == null) {
@@ -87,8 +95,28 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 ft.hide(mCurFragment);
                 ft.show(mAllNodeFragment);
             }
+            getSupportActionBar().setTitle("节点");
             mCurFragment = mAllNodeFragment;
         }
+        showIcon(id);
         ft.commit();
+    }
+
+    private void showIcon(int id){
+        mIvHome.setBackgroundResource(R.drawable.ic_home_grey);
+        mIvNode.setBackgroundResource(R.drawable.ic_node_grey);
+        mIvMy.setBackgroundResource(R.drawable.ic_user_grey);
+
+        switch (id){
+           case R.id.home:
+               mIvHome.setBackgroundResource(R.drawable.ic_home_primary);
+               break;
+            case R.id.node:
+                mIvNode.setBackgroundResource(R.drawable.ic_node_primary);
+                break;
+            case R.id.my:
+                mIvMy.setBackgroundResource(R.drawable.ic_user_primary);
+                break;
+        }
     }
 }

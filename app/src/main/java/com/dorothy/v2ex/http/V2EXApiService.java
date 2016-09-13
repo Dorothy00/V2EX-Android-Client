@@ -28,8 +28,8 @@ public interface V2EXApiService {
     @GET("api/topics/show.json")
     Call<List<Topic>> getTopicsByUsername(@Query("username") String username);
 
-    @GET("api/topics/show.json")
-    Call<List<Topic>> getTopicsByNode(@Query("node_name") String nodeName);
+    @GET("/go/{node}")
+    Call<String> getTopicsByNode(@Path("node") String nodeName);
 
     @GET("api/topics/hot.json")
     Call<List<Topic>> getHotTopics();
@@ -65,5 +65,11 @@ public interface V2EXApiService {
     @FormUrlEncoded
     @POST("/t/{id}")
     Call<String> commentTopic(@Path("id") long id, @FieldMap Map<String, String> params);
+
+    @GET("/my/nodes")
+    Call<String> getCollectedNodes();
+
+    @GET("{path}")
+    Call<String> collectNode(@Path("path") String path, @Query("once") String once);
 
 }

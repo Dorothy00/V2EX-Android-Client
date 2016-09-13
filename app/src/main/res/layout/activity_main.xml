@@ -19,29 +19,38 @@
         android:layout_height="0dp"
         android:layout_gravity="bottom"
         android:layout_weight="1"
-        android:background="@color/primary"
+        android:background="@drawable/bg_botton_bar"
         android:padding="@dimen/padding5">
-        <TextView
-            android:id="@+id/home"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:gravity="center"
-            android:text="首页"/>
 
-        <TextView
+        <ImageView
+            android:id="@+id/home"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/margin5"
+            android:background="@drawable/ic_home_grey"
+            android:gravity="center"
+            android:scaleType="centerCrop"
+        />
+
+        <ImageView
             android:id="@+id/node"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_node_grey"
             android:gravity="center"
+            android:scaleType="centerCrop"
             android:text="节点"/>
-        <TextView
+        <ImageView
             android:id="@+id/my"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/margin5"
+            android:background="@drawable/ic_user_grey"
             android:gravity="center"
+            android:scaleType="centerCrop"
             android:text="我的"/>
     </RelativeLayout>
 

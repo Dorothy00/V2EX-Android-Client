@@ -5,8 +5,8 @@
     <color name="reply_text">#F4F3F4</color>
     <color name="v2ex_grey">#444454</color>
     <color name="v2ex_normal_white">#E7E7E8</color>
-    <color name="primary_dark">#465A63</color>
-    <color name="primary">#617D8A</color>
+    <color name="primary_dark">#273440</color>
+    <color name="primary">#30404F</color>
     <color name="window_background">#FAFAFA</color>
     <color name="grey_line">#DEE0E0</color>
     <color name="text_grey">#8C8E8E</color>
@@ -16,4 +16,5 @@
     <color name="bg_notify_reply">#F5F5F5</color>
     <color name="text_notifiy_reply">#0B0000</color>
     <color name="text_hint">#AEB0B0</color>
+    <color name="tab_pressed">#858A8E</color>
 </resources>

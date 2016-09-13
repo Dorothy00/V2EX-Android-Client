@@ -25,14 +25,11 @@ public class V2EXHttpClient {
         if (httpClientBuilder.interceptors() != null) {
             httpClientBuilder.interceptors().clear();
         }
-//       httpClientBuilder.addInterceptor(new AddCookieIntercepter(context));
-//        httpClientBuilder.addInterceptor(new RecivedCookieIntercepter(context));
-//        httpClientBuilder
-//                .addNetworkInterceptor(new AddCookieIntercepter(context));
-        httpClientBuilder.addNetworkInterceptor(new RecivedCookieIntercepter(context)).addNetworkInterceptor(new AddCookieIntercepter(context));
+        httpClientBuilder.addNetworkInterceptor(new RecivedCookieIntercepter(context))
+                .addNetworkInterceptor(new AddCookieIntercepter(context));
 
         httpClientBuilder.connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS);
-
+       // httpClientBuilder.followRedirects(false);
         mOkhttpClient = httpClientBuilder.build();
     }
 

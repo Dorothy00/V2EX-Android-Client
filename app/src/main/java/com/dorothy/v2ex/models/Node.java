@@ -14,6 +14,16 @@ public class Node implements Serializable {
     private String url;
     private Integer topics;
 
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    private String imgUrl;
+
     /**
      * @return The id
      */

@@ -20,13 +20,6 @@ public class TopicFragment extends Fragment {
     private ViewPager mViewpager;
     private TabPageIndicator mTabPageIndicator;
 
-    public static TopicFragment newInstance() {
-        TopicFragment fragment = new TopicFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,13 +33,6 @@ public class TopicFragment extends Fragment {
         return root;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.getSupportActionBar().setTitle("首页");
-        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-    }
 
     class TopicTabPagerAdapter extends FragmentPagerAdapter {
         private final String[] CONTENT = new String[]{"技术", "创意", "好玩", "Apple", "酷工作", "交易",

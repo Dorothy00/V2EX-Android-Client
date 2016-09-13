@@ -1,10 +1,9 @@
-package com.dorothy.v2ex.activity;
+package com.dorothy.v2ex.fragment;
 
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.dorothy.v2ex.R;
 import com.dorothy.v2ex.View.CircleImageView;
+import com.dorothy.v2ex.activity.CollectedNodesActivity;
+import com.dorothy.v2ex.activity.NotificationActivity;
 import com.dorothy.v2ex.models.UserProfile;
 import com.dorothy.v2ex.utils.UserCache;
 
@@ -27,6 +28,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private TextView mTvBalance;
     private TextView mTvNotification;
     private RelativeLayout mRlNoticationContainer;
+    private RelativeLayout mRlNodeContainer;
 
     @Nullable
     @Override
@@ -42,20 +44,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mTvBalance = (TextView) root.findViewById(R.id.balance_count);
         mTvNotification = (TextView) root.findViewById(R.id.notification_count);
         mRlNoticationContainer = (RelativeLayout) root.findViewById(R.id.notification_container);
+        mRlNodeContainer = (RelativeLayout) root.findViewById(R.id.node_container);
 
         mRlNoticationContainer.setOnClickListener(this);
+        mRlNodeContainer.setOnClickListener(this);
         return root;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         UserProfile userProfile = UserCache.getUser(getActivity());
         if (userProfile != null) {
-            activity.getSupportActionBar().setTitle(userProfile.getUsername());
             Glide.with(getActivity()).load("http:" + userProfile.getAvatar()).into(mCiAvatar);
             mTvUsername.setText(userProfile.getUsername());
             mTvNode.setText(userProfile.getCollectedNodes());
@@ -72,6 +73,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         switch (id) {
             case R.id.notification_container:
                 startActivity(new Intent(getActivity(), NotificationActivity.class));
+                break;
+            case R.id.node_container:
+                startActivity(new Intent(getActivity(), CollectedNodesActivity.class));
                 break;
         }
     }

@@ -17,20 +17,21 @@
     <style name="CustomTabPageIndicator" parent="Widget.TabPageIndicator">
         <item name="android:background">@drawable/custom_tab_indicator</item>
         <item name="android:textAppearance">@style/CustomTabPageIndicator.Text</item>
-        <item name="android:textColor">@color/v2ex_normal_white</item>
+        <item name="android:textColor">@drawable/selector_tab_text</item>
         <item name="android:textSize">16sp</item>
         <!-- <item name="android:divider">@drawable/custom_tab_indicator_divider</item>-->
         <item name="android:dividerPadding">10dp</item>
         <item name="android:showDividers">none</item>
-        <item name="android:paddingLeft">18dp</item>
-        <item name="android:paddingRight">18dp</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
         <item name="android:fadingEdge">horizontal</item>
         <item name="android:fadingEdgeLength">8dp</item>
-        <item name="android:width">100dp</item>
+        <item name="android:width">80dp</item>
     </style>
 
     <style name="CustomTabPageIndicator.Text" parent="android:TextAppearance.Medium">
         <item name="android:typeface">monospace</item>
+        <item name="android:textColor">@drawable/selector_tab_text</item>
     </style>
     <style name="V2exAppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
     <style name="V2exAppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>

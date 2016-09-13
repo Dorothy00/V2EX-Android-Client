@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Html;
@@ -57,9 +56,6 @@ public class AllNodeFragment extends Fragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.getSupportActionBar().setTitle("节点");
-        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         layoutManager = new WrapStaggeredGridLayoutManager(2,
                 StaggeredGridLayoutManager.VERTICAL);
@@ -117,7 +113,7 @@ public class AllNodeFragment extends Fragment implements
     @Override
     public void onItemClick(int pos) {
         NodeDetail nodeDetail = mNodeList.get(pos);
-        startActivity(NodeTopicsActivity.newIntent(getActivity(), nodeDetail.getName()));
+        startActivity(NodeTopicsActivity.newIntent(getActivity(), nodeDetail.getName(), nodeDetail.getTitle()));
     }
 
     class NodeAdapter extends BaseRecyclerAdapter<NodeDetail> {

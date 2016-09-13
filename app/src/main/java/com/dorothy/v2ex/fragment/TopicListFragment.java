@@ -150,7 +150,7 @@ public class TopicListFragment extends Fragment implements BaseRecyclerAdapter.O
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response != null && response.isSuccessful()) {
                     String htmlStr = response.body();
-                    List<Topic> topicList = V2EXHtmlParser.parseTopicList(htmlStr);
+                    List<Topic> topicList = V2EXHtmlParser.parseTopicList(htmlStr, V2EXHtmlParser.FROM_TAB);
                     renderContent(topicList);
                 } else {
                     try {

@@ -34,14 +34,9 @@
         </activity>
         <activity android:name=".activity.NotificationActivity">
         </activity>
-        <activity android:name=".fragment.AllNodeFragment">
-        </activity>
         <activity android:name=".activity.NodeTopicsActivity">
         </activity>
-        <activity
-            android:name=".activity.Main2Activity"
-            android:label="@string/title_activity_main2"
-            android:theme="@style/V2exAppTheme">
+        <activity android:name=".activity.CollectedNodesActivity">
         </activity>
     </application>
 
