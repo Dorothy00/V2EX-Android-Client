@@ -5,7 +5,9 @@ import android.content.Context;
 import com.dorothy.v2ex.utils.V2EXCookieManager;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.Interceptor;
 import okhttp3.Response;
@@ -24,24 +26,27 @@ public class RecivedCookieIntercepter implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Response response = chain.proceed(chain.request());
-        String oldCookie = V2EXCookieManager.getCookie(context);
-//        if (!TextUtils.isEmpty(oldCookie)) {
-//            int end = oldCookie.indexOf(";");
-//            oldCookie = oldCookie.substring(0, end) + ";";
-//        }
 
-        List<String> cookies = response.headers().values("Set-Cookie");
-        StringBuilder sb = new StringBuilder();
-        sb.append(oldCookie);
-        if(oldCookie.contains("V2EX_LANG")){
-            sb.append(cookies.get(0) + ";");
-        }else{
-            for (String cookie : cookies) {
-                sb.append(cookie + ";");
+        Map<String, String> cookieMap = new HashMap<>();
+        List<String> cookieList = response.headers().values("Set-Cookie");
+        for (String cookies : cookieList) {
+            String[] cookieSet = cookies.split(";");
+            for (int i = 0; i < cookieSet.length; i++) {
+                String cookieStr = cookieSet[i];
+                if (!cookieStr.contains("="))
+                    continue;
+                if (cookieStr.startsWith("_gat"))
+                    continue;
+                if (cookieStr.startsWith("_ga"))
+                    continue;
+                int index = cookieStr.indexOf("=");
+                String key = cookieStr.substring(0, index);
+                String value = cookieStr.substring(index + 1);
+                cookieMap.put(key, value);
             }
         }
 
-        V2EXCookieManager.storeCookie(context, sb.toString());
+        V2EXCookieManager.storeCookie(context, cookieMap);
 
         return response;
     }

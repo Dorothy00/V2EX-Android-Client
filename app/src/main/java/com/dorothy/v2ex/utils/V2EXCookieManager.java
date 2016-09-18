@@ -5,10 +5,16 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by dorothy on 16/9/2.
@@ -16,30 +22,45 @@ import java.util.Locale;
 public class V2EXCookieManager {
 
     private static final String COOKIE_KEY = "Cookie";
-    private static final String EXPIRES_KEY = "expires";
     private static final String REFER_KEY = "refer";
 
-    public static void storeCookie(Context context, String cookie) {
+    public static void storeCookie(Context context, Map<String, String> cookies) {
+        Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
         SharedPreferences sharedPreferences = context.getSharedPreferences(COOKIE_KEY, Context
                 .MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(COOKIE_KEY, cookie);
-//        int start = cookie.indexOf("expires") + "expires=".length();
-//        if (start < 0) {
-//            editor.commit();
-//            return;
-//        }
-//        int end = cookie.indexOf("GMT") + 3;
-//        String expires = cookie.substring(start, end);
-//        editor.putString(EXPIRES_KEY, expires);
+        String oldCookiesStr = sharedPreferences.getString(COOKIE_KEY, "");
+        Map<String, String> oldCookiesMap = gson.fromJson(oldCookiesStr, new
+                TypeToken<Map<String, String>>() {
+                }.getType());
+
+        if (oldCookiesMap == null)
+            oldCookiesMap = new HashMap<>();
+
+        for (String key : cookies.keySet()) {
+            oldCookiesMap.put(key, cookies.get(key));
+        }
+        editor.putString(COOKIE_KEY, gson.toJson(oldCookiesMap));
         editor.commit();
     }
 
+
     public static String getCookie(Context context) {
+        Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
         SharedPreferences sharedPreferences = context.getSharedPreferences(COOKIE_KEY, Context
                 .MODE_PRIVATE);
         String cookie = sharedPreferences.getString(COOKIE_KEY, "");
-        return cookie;
+        if (TextUtils.isEmpty(cookie))
+            return "";
+
+        Map<String, String> cookieMap = gson.fromJson(cookie, new TypeToken<Map<String, String>>() {
+        }.getType());
+        StringBuilder sb = new StringBuilder();
+        for (String key : cookieMap.keySet()) {
+            String cookieStr = key + "=" + cookieMap.get(key) + ";";
+            sb.append(cookieStr);
+        }
+        return sb.toString();
     }
 
     public static void clearCookie(Context context) {
@@ -58,10 +79,17 @@ public class V2EXCookieManager {
         UserCache.clearUserCache(context);
     }
 
-    public static boolean isEXpired(Context context) {
+    public static boolean isExpired(Context context) {
+        Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
         SharedPreferences sharedPreferences = context.getSharedPreferences(COOKIE_KEY, Context
                 .MODE_PRIVATE);
-        String expires = sharedPreferences.getString(EXPIRES_KEY, "");
+        String cookie = sharedPreferences.getString(COOKIE_KEY, "");
+        if (TextUtils.isEmpty(cookie))
+            return true;
+
+        Map<String, String> cookieMap = gson.fromJson(cookie, new TypeToken<Map<String, String>>() {
+        }.getType());
+        String expires = cookieMap.get(" expires");
         SimpleDateFormat format = new SimpleDateFormat("EEE',' d MMM yyyy HH:mm:ss 'GMT'", Locale
                 .ENGLISH);
         if (TextUtils.isEmpty(expires))

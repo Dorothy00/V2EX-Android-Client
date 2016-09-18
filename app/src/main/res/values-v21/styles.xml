@@ -4,5 +4,10 @@
     <style name="V2exAppTheme" parent="AppTheme">
         <item name="android:statusBarColor">@color/primary_dark</item>
         <item name="android:windowFullscreen">false</item>
+        <item name="android:alertDialogTheme">@style/V2ex.AlertDialog</item>
+    </style>
+
+    <style name="V2ex.AlertDialog" parent="@style/Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:colorAccent">@android:color/holo_red_light</item>
     </style>
 </resources>

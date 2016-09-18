@@ -8,6 +8,7 @@
         <item name="android:textColorPrimary">@color/v2ex_normal_white</item>
         <item name="colorControlNormal">@color/v2ex_normal_white</item>
         <item name="vpiTabPageIndicatorStyle">@style/CustomTabPageIndicator</item>
+        <item name="alertDialogTheme">@style/V2ex.AlertDialog</item>
 
 
     </style>
@@ -27,6 +28,10 @@
         <item name="android:fadingEdge">horizontal</item>
         <item name="android:fadingEdgeLength">8dp</item>
         <item name="android:width">80dp</item>
+    </style>
+
+    <style name="V2ex.AlertDialog" parent="@style/Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@android:color/holo_red_light</item>
     </style>
 
     <style name="CustomTabPageIndicator.Text" parent="android:TextAppearance.Medium">

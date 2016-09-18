@@ -4,9 +4,9 @@ package com.dorothy.v2ex.fragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +19,7 @@ public class TopicFragment extends Fragment {
 
     private ViewPager mViewpager;
     private TabPageIndicator mTabPageIndicator;
+    private FloatingActionButton mFloatBtn;
 
 
     @Override
@@ -30,6 +31,7 @@ public class TopicFragment extends Fragment {
         TopicTabPagerAdapter adapter = new TopicTabPagerAdapter(getActivity().getFragmentManager());
         mViewpager.setAdapter(adapter);
         mTabPageIndicator.setViewPager(mViewpager);
+        mFloatBtn = (FloatingActionButton) root.findViewById(R.id.fab);
         return root;
     }
 

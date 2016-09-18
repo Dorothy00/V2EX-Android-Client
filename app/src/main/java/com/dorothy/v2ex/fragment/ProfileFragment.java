@@ -1,12 +1,15 @@
 package com.dorothy.v2ex.fragment;
 
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -17,6 +20,7 @@ import com.dorothy.v2ex.activity.CollectedNodesActivity;
 import com.dorothy.v2ex.activity.NotificationActivity;
 import com.dorothy.v2ex.models.UserProfile;
 import com.dorothy.v2ex.utils.UserCache;
+import com.dorothy.v2ex.utils.V2EXCookieManager;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
@@ -29,6 +33,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private TextView mTvNotification;
     private RelativeLayout mRlNoticationContainer;
     private RelativeLayout mRlNodeContainer;
+    private Button mBtnLogout;
 
     @Nullable
     @Override
@@ -45,9 +50,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mTvNotification = (TextView) root.findViewById(R.id.notification_count);
         mRlNoticationContainer = (RelativeLayout) root.findViewById(R.id.notification_container);
         mRlNodeContainer = (RelativeLayout) root.findViewById(R.id.node_container);
+        mBtnLogout = (Button) root.findViewById(R.id.logout);
 
         mRlNoticationContainer.setOnClickListener(this);
         mRlNodeContainer.setOnClickListener(this);
+        mBtnLogout.setOnClickListener(this);
         return root;
     }
 
@@ -77,6 +84,29 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             case R.id.node_container:
                 startActivity(new Intent(getActivity(), CollectedNodesActivity.class));
                 break;
+            case R.id.logout:
+                showDialog();
+                break;
         }
+    }
+
+    private void showDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("退出登录");
+        builder.setMessage("是否确认退出登录?");
+        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                V2EXCookieManager.clearCookie(getActivity());
+                getActivity().finish();
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
     }
 }

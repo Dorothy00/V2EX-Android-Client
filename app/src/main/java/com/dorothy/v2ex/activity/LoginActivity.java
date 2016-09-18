@@ -1,5 +1,6 @@
 package com.dorothy.v2ex.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -32,18 +33,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText mEtUsername;
     private EditText mEtPassword;
     private Button mBtnLogin;
+    private ProgressDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-     //   V2EXCookieManager.clearCookie(this);
-        if (2==2) {
+        if (!V2EXCookieManager.isExpired(this)) {
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
             finish();
             return;
         }
+
+        mDialog = new ProgressDialog(this);
+        mDialog.setCancelable(false);
+        mDialog.setCanceledOnTouchOutside(false);
+        mDialog.setIndeterminate(true);
+        mDialog.setMessage("正在登录...             ");
+        mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
         mEtUsername = (EditText) findViewById(R.id.username);
         mEtPassword = (EditText) findViewById(R.id.password);
@@ -95,6 +103,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      * 首先获取登陆页面,从登陆页面中解析出 login 所需的field
      */
     private void requestLoginPage() {
+
+        mDialog.show();
+
         Retrofit retrofit = V2EXHttpClient.retrofit(this);
         V2EXApiService apiService = retrofit.create(V2EXApiService.class);
         Call<String> call = apiService.getLoginPage();
@@ -116,7 +127,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-
+                mDialog.dismiss();
             }
         });
     }
@@ -146,7 +157,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-
+                mDialog.dismiss();
             }
         });
     }
@@ -159,6 +170,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response != null && response.isSuccessful()) {
+                    mDialog.dismiss();
                     UserProfile userProfile = V2EXHtmlParser.parseUserProfile(response.body());
                     UserCache.userCache(LoginActivity.this, userProfile);
                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
@@ -172,7 +184,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 //TODO
+                mDialog.dismiss();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mDialog != null) {
+            mDialog.dismiss();
+            mDialog = null;
+        }
+        super.onDestroy();
     }
 }
