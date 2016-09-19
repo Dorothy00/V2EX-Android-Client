@@ -1,9 +1,7 @@
 package com.dorothy.v2ex.activity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -28,15 +26,14 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
     private EditText mEtUsername;
     private EditText mEtPassword;
     private Button mBtnLogin;
-    private ProgressDialog mDialog;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         if (!V2EXCookieManager.isExpired(this)) {
@@ -45,13 +42,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             finish();
             return;
         }
-
-        mDialog = new ProgressDialog(this);
-        mDialog.setCancelable(false);
-        mDialog.setCanceledOnTouchOutside(false);
-        mDialog.setIndeterminate(true);
-        mDialog.setMessage("正在登录...             ");
-        mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
         mEtUsername = (EditText) findViewById(R.id.username);
         mEtPassword = (EditText) findViewById(R.id.password);
@@ -104,8 +94,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      */
     private void requestLoginPage() {
 
-        mDialog.show();
-
+        showProgressDialogs("正在登录...");
         Retrofit retrofit = V2EXHttpClient.retrofit(this);
         V2EXApiService apiService = retrofit.create(V2EXApiService.class);
         Call<String> call = apiService.getLoginPage();
@@ -121,13 +110,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     paramsMap.put("next", "/");
                     doLogin(paramsMap);
                 } else {
-
+                    dismissProgressDialog();
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                mDialog.dismiss();
+                dismissProgressDialog();
             }
         });
     }
@@ -151,13 +140,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     } else {
                         // Login Failure
+                        dismissProgressDialog();
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                mDialog.dismiss();
+                dismissProgressDialog();
             }
         });
     }
@@ -169,8 +159,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
+                dismissProgressDialog();
                 if (response != null && response.isSuccessful()) {
-                    mDialog.dismiss();
+                    //mDialog.dismiss();
                     UserProfile userProfile = V2EXHtmlParser.parseUserProfile(response.body());
                     UserCache.userCache(LoginActivity.this, userProfile);
                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
@@ -184,17 +175,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 //TODO
-                mDialog.dismiss();
+                dismissProgressDialog();
             }
         });
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (mDialog != null) {
-            mDialog.dismiss();
-            mDialog = null;
-        }
-        super.onDestroy();
     }
 }

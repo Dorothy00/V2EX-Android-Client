@@ -72,4 +72,11 @@ public interface V2EXApiService {
     @GET("{path}")
     Call<String> collectNode(@Path("path") String path, @Query("once") String once);
 
+    @GET("/new")
+    Call<String> getNewTopicPage();
+
+    @FormUrlEncoded
+    @POST("/new")
+    Call<String> postNewTopic(@FieldMap Map<String, String> params);
+
 }

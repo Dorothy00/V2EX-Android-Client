@@ -38,6 +38,10 @@
         </activity>
         <activity android:name=".activity.CollectedNodesActivity">
         </activity>
+        <activity android:name=".activity.NewTopicActivity">
+        </activity>
+        <activity android:name=".activity.CategoryActivity">
+        </activity>
     </application>
 
 </manifest>

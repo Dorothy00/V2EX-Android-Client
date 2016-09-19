@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.dorothy.v2ex.R;
+import com.dorothy.v2ex.activity.NewTopicActivity;
 import com.viewpagerindicator.TabPageIndicator;
 
 public class TopicFragment extends Fragment {
@@ -28,10 +29,18 @@ public class TopicFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_topic, container, false);
         mViewpager = (ViewPager) root.findViewById(R.id.view_pager);
         mTabPageIndicator = (TabPageIndicator) root.findViewById(R.id.page_indicator);
-        TopicTabPagerAdapter adapter = new TopicTabPagerAdapter(getActivity().getFragmentManager());
+        final TopicTabPagerAdapter adapter = new TopicTabPagerAdapter(getActivity()
+                .getFragmentManager());
         mViewpager.setAdapter(adapter);
         mTabPageIndicator.setViewPager(mViewpager);
         mFloatBtn = (FloatingActionButton) root.findViewById(R.id.fab);
+        mFloatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String title = adapter.getPageTitle(mViewpager.getCurrentItem()).toString();
+                startActivity(NewTopicActivity.newIntent(getActivity(), title));
+            }
+        });
         return root;
     }
 

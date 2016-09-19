@@ -281,4 +281,10 @@ public class V2EXHtmlParser {
         return nodeList;
     }
 
+    public static String parseNewTopicOnce(String htmlStr) {
+        Document document = Jsoup.parse(htmlStr);
+        String once = document.select("div[id=Main]").select("input[name=once]").attr("value");
+        return once;
+    }
+
 }

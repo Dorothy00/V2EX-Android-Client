@@ -34,6 +34,10 @@
         <item name="colorAccent">@android:color/holo_red_light</item>
     </style>
 
+    <style name="V2ex.ProgressDialog" parent="@style/Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@android:color/holo_red_light</item>
+    </style>
+
     <style name="CustomTabPageIndicator.Text" parent="android:TextAppearance.Medium">
         <item name="android:typeface">monospace</item>
         <item name="android:textColor">@drawable/selector_tab_text</item>
