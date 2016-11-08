@@ -16,18 +16,12 @@ import com.dorothy.v2ex.View.CircleImageView;
 import com.dorothy.v2ex.View.WrapLinearLayoutManager;
 import com.dorothy.v2ex.adapter.BaseRecyclerAdapter;
 import com.dorothy.v2ex.adapter.RecyclerViewHolder;
-import com.dorothy.v2ex.http.V2EXApiService;
 import com.dorothy.v2ex.http.V2EXHttpClient;
+import com.dorothy.v2ex.http.V2EXSubscriberAdapter;
 import com.dorothy.v2ex.models.Node;
-import com.dorothy.v2ex.utils.V2EXHtmlParser;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class CollectedNodesActivity extends AppCompatActivity implements SwipeRefreshLayout
         .OnRefreshListener, BaseRecyclerAdapter.OnItemClickListener {
@@ -75,37 +69,28 @@ public class CollectedNodesActivity extends AppCompatActivity implements SwipeRe
             case android.R.id.home:
                 finish();
                 break;
-
         }
-
         return true;
     }
 
     private void fetchCollectedNodes() {
-        Retrofit retrofit = V2EXHttpClient.retrofit(this);
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<String> call = apiService.getCollectedNodes();
-        call.enqueue(new Callback<String>() {
+
+        V2EXHttpClient.getCollectedNodes(this, new V2EXSubscriberAdapter<List<Node>>(this) {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response != null && response.isSuccessful()) {
-                    List<Node> nodeList = V2EXHtmlParser.parseCollectedNode(response.body());
-                    mNodeList.clear();
-                    mNodeList.addAll(nodeList);
-                    mAdapter.notifyItemRangeInserted(0, mNodeList.size());
-                } else {
-                    //TODO
-                }
+            public void onNext(List<Node> nodes) {
+                super.onNext(nodes);
+                mNodeList.clear();
+                mNodeList.addAll(nodes);
+                mAdapter.notifyItemRangeInserted(0, mNodeList.size());
                 mSwipeView.setRefreshing(false);
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                //TODO
+            public void onError(Throwable e) {
+                super.onError(e);
                 mSwipeView.setRefreshing(false);
             }
         });
-
     }
 
     @Override

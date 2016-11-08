@@ -171,6 +171,12 @@ public class V2EXHtmlParser {
         return true;
     }
 
+    public static String parseLoginErrorMsg(String htmlStr) {
+        Document document = Jsoup.parse(htmlStr);
+        String errMsg = document.select("div[class=problem]").select("li").text();
+        return errMsg;
+    }
+
     public static UserProfile parseUserProfile(String htmlStr) {
         UserProfile userProfile = new UserProfile();
         Document document = Jsoup.parse(htmlStr);
@@ -285,6 +291,21 @@ public class V2EXHtmlParser {
         Document document = Jsoup.parse(htmlStr);
         String once = document.select("div[id=Main]").select("input[name=once]").attr("value");
         return once;
+    }
+
+    public static String parseNewTopicProblem(String htmlStr) {
+        Document document = Jsoup.parse(htmlStr);
+        String problemStr = document.select("div[class=problem]").text();
+        return problemStr;
+    }
+
+    public static boolean isPostNewTopicSuccess(String htmlStr) {
+        Document document = Jsoup.parse(htmlStr);
+        if (document.select("div[class=problem]") == null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

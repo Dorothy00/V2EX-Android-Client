@@ -10,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dorothy.v2ex.R;
@@ -17,20 +19,14 @@ import com.dorothy.v2ex.View.WrapLinearLayoutManager;
 import com.dorothy.v2ex.activity.TopicDetailActivity;
 import com.dorothy.v2ex.adapter.BaseRecyclerAdapter;
 import com.dorothy.v2ex.adapter.TopicsAdapter;
-import com.dorothy.v2ex.http.V2EXApiService;
+import com.dorothy.v2ex.http.NetWorkUnavaliableException;
 import com.dorothy.v2ex.http.V2EXHttpClient;
+import com.dorothy.v2ex.http.V2EXSubscriberAdapter;
 import com.dorothy.v2ex.models.Topic;
 import com.dorothy.v2ex.utils.V2EXHtmlParser;
-import com.dorothy.v2ex.utils.V2EXStringConverter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,6 +52,8 @@ public class TopicListFragment extends Fragment implements BaseRecyclerAdapter.O
     private List<Topic> mTopicList = new ArrayList<>();
     private TopicsAdapter mTopicsAdapter;
     private SwipeRefreshLayout mSwipeView;
+    private ViewStub mVbError;
+    private TextView mTvError;
     private String mType;
     private boolean mIsFirstTime;
 
@@ -72,6 +70,7 @@ public class TopicListFragment extends Fragment implements BaseRecyclerAdapter.O
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_topic_list, container, false);
+        mVbError = (ViewStub) view.findViewById(R.id.error_view);
         mRvTopicsView = (RecyclerView) view.findViewById(R.id.topic_list);
         mSwipeView = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         mRvTopicsView.setLayoutManager(new WrapLinearLayoutManager(getActivity()));
@@ -101,79 +100,41 @@ public class TopicListFragment extends Fragment implements BaseRecyclerAdapter.O
 
 
     private void fetchTopicsByAPI(String type) {
-        Retrofit retrofit = V2EXHttpClient.retrofit(getActivity());
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<List<Topic>> call = null;
-
-        switch (type) {
-            case TOPIC_LATEST:
-                call = apiService.getLatestTopics();
-                break;
-            case TOPIC_HOT:
-                call = apiService.getHotTopics();
-                break;
-        }
-
-        call.enqueue(new Callback<List<Topic>>() {
+        V2EXHttpClient.getTopicByAPI(getActivity(), type, new V2EXSubscriberAdapter<List<Topic>>
+                (getActivity()) {
             @Override
-            public void onResponse(Call<List<Topic>> call, Response<List<Topic>> response) {
-                if (response != null && response.isSuccessful()) {
-                    renderContent(response.body());
-                } else {
-                    Toast.makeText(getActivity(), getString(R.string.http_error), Toast
-                            .LENGTH_SHORT).show();
-                }
-                mSwipeView.setRefreshing(false);
+            public void onError(Throwable e) {
+                handleError(e);
             }
 
             @Override
-            public void onFailure(Call<List<Topic>> call, Throwable t) {
-                if (t != null) {
-                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT)
-                            .show();
-                }
-                if (mSwipeView.isRefreshing())
-                    mSwipeView.setRefreshing(false);
+            public void onNext(List<Topic> topics) {
+                mSwipeView.setRefreshing(false);
+                renderContent(topics);
             }
         });
-
     }
 
     private void fetchTopicsByTag(String type) {
-        final Retrofit retrofit = new Retrofit.Builder().baseUrl(V2EXApiService.BASE_URL)
-                .addConverterFactory(V2EXStringConverter.create()).build();
 
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<String> call = apiService.getTopicsByTab(type);
-        call.enqueue(new Callback<String>() {
+        V2EXHttpClient.getTopicsByTab(getActivity(), type, new V2EXSubscriberAdapter<String>
+                (getActivity()) {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response != null && response.isSuccessful()) {
-                    String htmlStr = response.body();
-                    List<Topic> topicList = V2EXHtmlParser.parseTopicList(htmlStr, V2EXHtmlParser.FROM_TAB);
-                    renderContent(topicList);
-                } else {
-                    try {
-                        Toast.makeText(getActivity(), response.errorBody().string(), Toast
-                                .LENGTH_SHORT).show();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+            public void onError(Throwable e) {
+                handleError(e);
+            }
 
+            @Override
+            public void onNext(String s) {
+                if (mTvError != null && mTvError.getVisibility() == View.VISIBLE) {
+                    mTvError.setVisibility(View.GONE);
+                }
+                List<Topic> topicList = V2EXHtmlParser.parseTopicList(s, V2EXHtmlParser.FROM_TAB);
+                renderContent(topicList);
                 mSwipeView.setRefreshing(false);
             }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                if (t != null) {
-                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT)
-                            .show();
-                }
-                if (mSwipeView.isRefreshing())
-                    mSwipeView.setRefreshing(false);
-            }
         });
+
     }
 
     private void renderContent(List<Topic> topicList) {
@@ -202,5 +163,19 @@ public class TopicListFragment extends Fragment implements BaseRecyclerAdapter.O
     public void onItemClick(int pos) {
         Topic topic = mTopicList.get(pos);
         startActivity(TopicDetailActivity.newIntent(getActivity(), topic.getId()));
+    }
+
+    private void handleError(Throwable e) {
+        mSwipeView.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeView.setRefreshing(false);
+            }
+        });
+        if (mTvError == null) {
+            mTvError = (TextView) mVbError.inflate();
+        } else {
+            mTvError.setVisibility(View.VISIBLE);
+        }
     }
 }

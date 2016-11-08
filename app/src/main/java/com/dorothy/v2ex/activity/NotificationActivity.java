@@ -16,18 +16,12 @@ import com.dorothy.v2ex.View.CircleImageView;
 import com.dorothy.v2ex.View.WrapLinearLayoutManager;
 import com.dorothy.v2ex.adapter.BaseRecyclerAdapter;
 import com.dorothy.v2ex.adapter.RecyclerViewHolder;
-import com.dorothy.v2ex.http.V2EXApiService;
 import com.dorothy.v2ex.http.V2EXHttpClient;
+import com.dorothy.v2ex.http.V2EXSubscriberAdapter;
 import com.dorothy.v2ex.models.Notification;
-import com.dorothy.v2ex.utils.V2EXHtmlParser;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class NotificationActivity extends AppCompatActivity implements SwipeRefreshLayout
         .OnRefreshListener, BaseRecyclerAdapter.OnItemClickListener {
@@ -80,28 +74,20 @@ public class NotificationActivity extends AppCompatActivity implements SwipeRefr
     }
 
     private void fetchNotifications() {
-        Retrofit retrofit = V2EXHttpClient.retrofit(this);
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<String> call = apiService.getNotification();
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response != null && response.isSuccessful()) {
-                    List<Notification> notificationList = V2EXHtmlParser.parseNotification
-                            (response.body());
-                    mNotifyList.clear();
-                    mNotifyList.addAll(notificationList);
-                    mAdapter.notifyItemRangeInserted(0, notificationList.size());
 
-                } else {
-                    // TODO
-                }
+        V2EXHttpClient.getNotification(this, new V2EXSubscriberAdapter<List<Notification>>(this) {
+            @Override
+            public void onNext(List<Notification> notifications) {
+                super.onNext(notifications);
+                mNotifyList.clear();
+                mNotifyList.addAll(notifications);
+                mAdapter.notifyItemRangeInserted(0, notifications.size());
                 mSwipeView.setRefreshing(false);
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                // TODO
+            public void onError(Throwable e) {
+                super.onError(e);
                 mSwipeView.setRefreshing(false);
             }
         });

@@ -27,8 +27,8 @@ import com.dorothy.v2ex.View.CircleImageView;
 import com.dorothy.v2ex.View.WrapLinearLayoutManager;
 import com.dorothy.v2ex.adapter.BaseRecyclerAdapter;
 import com.dorothy.v2ex.adapter.RecyclerViewHolder;
-import com.dorothy.v2ex.http.V2EXApiService;
 import com.dorothy.v2ex.http.V2EXHttpClient;
+import com.dorothy.v2ex.http.V2EXSubscriberAdapter;
 import com.dorothy.v2ex.models.Member;
 import com.dorothy.v2ex.models.Reply;
 import com.dorothy.v2ex.models.Topic;
@@ -41,11 +41,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class TopicDetailActivity extends AppCompatActivity implements BaseRecyclerAdapter
         .OnItemClickListener,
@@ -128,33 +123,23 @@ public class TopicDetailActivity extends AppCompatActivity implements BaseRecycl
         if (mTopicId < 0)
             return;
 
-        Retrofit retrofit = V2EXHttpClient.retrofit(this);
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<String> call = apiService.getTopicById(topicId);
-        call.enqueue(new Callback<String>() {
+        V2EXHttpClient.getTopicById(this, topicId, new V2EXSubscriberAdapter<String>(this) {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response != null && response.isSuccessful()) {
-                    mTopic = V2EXHtmlParser.parseTopic(response.body());
-                    renderContent(mTopic);
-                    List<Reply> replyList = V2EXHtmlParser.parseReply(response.body());
-                    mReplyList.clear();
-                    mReplyList.addAll(replyList);
-                    mRepliesAdapter.notifyItemRangeInserted(0, mReplyList.size());
-
-                } else {
-                    //TODO
-                }
+            public void onError(Throwable e) {
+                super.onError(e);
                 mSwipeView.setRefreshing(false);
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                if (t != null) {
-                    Toast.makeText(TopicDetailActivity.this, t.getMessage(), Toast.LENGTH_SHORT)
-                            .show();
-                    mSwipeView.setRefreshing(false);
-                }
+            public void onNext(String s) {
+                super.onNext(s);
+                mSwipeView.setRefreshing(false);
+                mTopic = V2EXHtmlParser.parseTopic(s);
+                renderContent(mTopic);
+                List<Reply> replyList = V2EXHtmlParser.parseReply(s);
+                mReplyList.clear();
+                mReplyList.addAll(replyList);
+                mRepliesAdapter.notifyItemRangeInserted(0, mReplyList.size());
             }
         });
     }
@@ -168,43 +153,34 @@ public class TopicDetailActivity extends AppCompatActivity implements BaseRecycl
                 Toast.makeText(TopicDetailActivity.this, "回复内容不能为空!", Toast.LENGTH_SHORT).show();
                 mEtReplyContent.requestFocus();
             } else {
-                Retrofit retrofit = V2EXHttpClient.retrofit(TopicDetailActivity.this);
-                V2EXApiService apiService = retrofit.create(V2EXApiService.class);
                 Map<String, String> params = new HashMap<>();
                 params.put("once", mTopic.getOnce());
                 params.put("content", replyContent);
-                Call<String> call = apiService.commentTopic(mTopicId, params);
-                call.enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-                        if (response != null && response.isSuccessful()) {
-                            Reply reply = new Reply();
-                            Member member = new Member();
-                            reply.setMember(member);
-                            reply.setContentRendered(mEtReplyContent.getText().toString());
-                            UserProfile userProfile = UserCache.getUser(TopicDetailActivity.this);
-                            member.setUsername(userProfile.getUsername());
-                            member.setAvatarNormal(userProfile.getAvatar());
-                            int pos = mReplyList.size();
-                            mReplyList.add(reply);
-                            mRepliesAdapter.notifyItemInserted(pos);
 
-                            mEtReplyContent.setText("");
-                            mEtReplyContent.clearFocus();
-                            InputMethodManager imm = (InputMethodManager) getSystemService
-                                    (Context.INPUT_METHOD_SERVICE);
-                            imm.hideSoftInputFromWindow(mEtReplyContent.getWindowToken(), 0);
-                        } else {
-                            // TODO
-                        }
-                    }
+                V2EXHttpClient.commentTopic(TopicDetailActivity.this, mTopicId, params, new
+                        V2EXSubscriberAdapter<String>(TopicDetailActivity.this) {
 
                     @Override
-                    public void onFailure(Call<String> call, Throwable t) {
+                    public void onNext(String s) {
+                        super.onNext(s);
+                        Reply reply = new Reply();
+                        Member member = new Member();
+                        reply.setMember(member);
+                        reply.setContentRendered(mEtReplyContent.getText().toString());
+                        UserProfile userProfile = UserCache.getUser(TopicDetailActivity.this);
+                        member.setUsername(userProfile.getUsername());
+                        member.setAvatarNormal(userProfile.getAvatar());
+                        int pos = mReplyList.size();
+                        mReplyList.add(reply);
+                        mRepliesAdapter.notifyItemInserted(pos);
 
+                        mEtReplyContent.setText("");
+                        mEtReplyContent.clearFocus();
+                        InputMethodManager imm = (InputMethodManager) getSystemService
+                                (Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(mEtReplyContent.getWindowToken(), 0);
                     }
                 });
-
             }
         }
     };

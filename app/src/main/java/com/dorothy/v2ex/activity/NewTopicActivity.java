@@ -1,6 +1,7 @@
 package com.dorothy.v2ex.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,20 +10,17 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.dorothy.v2ex.R;
-import com.dorothy.v2ex.http.V2EXApiService;
+import com.dorothy.v2ex.http.NetWorkUnavaliableException;
 import com.dorothy.v2ex.http.V2EXHttpClient;
+import com.dorothy.v2ex.http.V2EXSubscriberAdapter;
 import com.dorothy.v2ex.utils.V2EXHtmlParser;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class NewTopicActivity extends BaseActivity {
 
@@ -55,65 +53,54 @@ public class NewTopicActivity extends BaseActivity {
     }
 
     private void fetchNewTopicPage() {
-
-        Retrofit retrofit = V2EXHttpClient.retrofit(this);
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<String> call = apiService.getNewTopicPage();
-        showProgressDialogs("正在发布新话题...       ");
-        call.enqueue(new Callback<String>() {
+        showProgressDialog("正在发布新话题...       ");
+        InputMethodManager imm = (InputMethodManager) getSystemService
+                (Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mEtContet.getWindowToken(), 0);
+        V2EXHttpClient.getNewTopicPage(this, new V2EXSubscriberAdapter<String>(this) {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response != null && response.isSuccessful()) {
-                    String once = V2EXHtmlParser.parseNewTopicOnce(response.body());
-                    postNewTopic(once);
-                } else {
-                    showToast("主题发布失败");
-                }
+            public void onNext(String s) {
+                dismissProgressDialog();
+                String once = V2EXHtmlParser.parseNewTopicOnce(s);
+                postNewTopic(once);
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onError(Throwable e) {
+                super.onError(e);
                 dismissProgressDialog();
-                if (t != null) {
-                    showToast(t.getMessage() + " ");
-                } else {
-                    showToast("主题发布失败");
-                }
             }
         });
     }
 
     private void postNewTopic(String once) {
-        Retrofit retrofit = V2EXHttpClient.retrofit(this);
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
         Map<String, String> params = new HashMap<>();
         params.put("once", once);
         params.put("title", mEtTitle.getText().toString());
         params.put("content", mEtContet.getText().toString());
         params.put("node_name", mNodeName);
-        Call<String> call = apiService.postNewTopic(params);
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                dismissProgressDialog();
-                if (response != null && response.isSuccessful()) {
+        //params.put("node_name", "sandbox");
 
+        V2EXHttpClient.postNewTopic(this, params, new V2EXSubscriberAdapter<String>(this) {
+            @Override
+            public void onNext(String s) {
+                super.onNext(s);
+                if (V2EXHtmlParser.isPostNewTopicSuccess(s)) {
+                    showToast("发布成功");
                 } else {
-                    showToast("主题发布失败");
+                    showLongToast(V2EXHtmlParser.parseNewTopicProblem(s));
                 }
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                dismissProgressDialog();
-                if (t != null) {
-                    showToast(t.getMessage());
+            public void onError(Throwable e) {
+                if (e instanceof NetWorkUnavaliableException) {
+                    showToast("网络未连接");
                 } else {
                     showToast("主题发布失败");
                 }
             }
         });
-
     }
 
     @Override

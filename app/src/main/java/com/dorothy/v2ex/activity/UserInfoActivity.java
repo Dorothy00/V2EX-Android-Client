@@ -15,14 +15,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.dorothy.v2ex.R;
 import com.dorothy.v2ex.View.CircleImageView;
 import com.dorothy.v2ex.adapter.BaseRecyclerAdapter;
 import com.dorothy.v2ex.adapter.TopicsAdapter;
-import com.dorothy.v2ex.http.V2EXApiService;
+import com.dorothy.v2ex.http.V2EXHttpClient;
+import com.dorothy.v2ex.http.V2EXSubscriberAdapter;
 import com.dorothy.v2ex.models.Member;
 import com.dorothy.v2ex.models.MemberDetail;
 import com.dorothy.v2ex.models.Topic;
@@ -30,12 +30,6 @@ import com.dorothy.v2ex.utils.URLSpanNoUnderline;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class UserInfoActivity extends AppCompatActivity implements BaseRecyclerAdapter
         .OnItemClickListener {
@@ -112,90 +106,56 @@ public class UserInfoActivity extends AppCompatActivity implements BaseRecyclerA
     }
 
     private void fetchMemberDetail(String username) {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(V2EXApiService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create()).build();
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<MemberDetail> call = apiService.getMemberDetail(username);
-        call.enqueue(new Callback<MemberDetail>() {
+        V2EXHttpClient.getMemberDetail(this, username, new V2EXSubscriberAdapter<MemberDetail>
+                (this) {
             @Override
-            public void onResponse(Call<MemberDetail> call, Response<MemberDetail> response) {
-                if (response!= null && response.isSuccessful()) {
-                    memberDetail = response.body();
-                    String homeInfo = memberDetail.getWebsite();
-                    String githubInfo = memberDetail.getGithub();
+            public void onNext(MemberDetail memberDetail) {
+                String homeInfo = memberDetail.getWebsite();
+                String githubInfo = memberDetail.getGithub();
 
-                    if (!TextUtils.isEmpty(homeInfo)) {
-                        SpannableString homeSpan = new SpannableString(homeInfo);
-                        homeSpan.setSpan(new URLSpanNoUnderline(homeInfo), 0, homeInfo.length(),
-                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        mTvHomePage.setText(homeSpan);
-                        mTvHomePage.setMovementMethod(LinkMovementMethod.getInstance());
-                        mIvHomeArrow.setVisibility(View.VISIBLE);
-                    } else {
-                        mTvHomePage.setText(getString(R.string.no_settings));
-                    }
-                    if (!TextUtils.isEmpty(githubInfo)) {
-                        SpannableString githubSpan = new SpannableString(githubInfo);
-                        githubSpan.setSpan(new URLSpanNoUnderline("https://github.com/" +
-                                githubInfo), 0, githubInfo.length(), Spanned
-                                .SPAN_EXCLUSIVE_EXCLUSIVE);
-                        mTvGitHubPage.setText(githubSpan);
-                        mTvGitHubPage.setMovementMethod(LinkMovementMethod.getInstance());
-                        mIvGithubArrow.setVisibility(View.VISIBLE);
-                    } else {
-                        mTvGitHubPage.setText(getString(R.string.no_settings));
-                    }
-
-                    // Html 解析得不到数据的情况
-                    Glide.with(UserInfoActivity.this).load("http:" + memberDetail.getAvatarLarge())
-                            .into(mCiAvatar);
-                    mTvV2exInfo.setText(getString(R.string.member_number).replace("{id}",
-                            memberDetail
-                                    .getId()
-                                    + ""));
-
-                    fetchUserTopics(memberDetail.getUsername());
+                if (!TextUtils.isEmpty(homeInfo)) {
+                    SpannableString homeSpan = new SpannableString(homeInfo);
+                    homeSpan.setSpan(new URLSpanNoUnderline(homeInfo), 0, homeInfo.length(),
+                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    mTvHomePage.setText(homeSpan);
+                    mTvHomePage.setMovementMethod(LinkMovementMethod.getInstance());
+                    mIvHomeArrow.setVisibility(View.VISIBLE);
                 } else {
-                    Toast.makeText(UserInfoActivity.this, getString(R.string.http_error), Toast
-                            .LENGTH_SHORT).show();
+                    mTvHomePage.setText(getString(R.string.no_settings));
                 }
-            }
-
-            @Override
-            public void onFailure(Call<MemberDetail> call, Throwable t) {
-                if (t != null) {
-                    Toast.makeText((UserInfoActivity.this), t.getMessage(), Toast.LENGTH_SHORT)
-                            .show();
+                if (!TextUtils.isEmpty(githubInfo)) {
+                    SpannableString githubSpan = new SpannableString(githubInfo);
+                    githubSpan.setSpan(new URLSpanNoUnderline("https://github.com/" +
+                            githubInfo), 0, githubInfo.length(), Spanned
+                            .SPAN_EXCLUSIVE_EXCLUSIVE);
+                    mTvGitHubPage.setText(githubSpan);
+                    mTvGitHubPage.setMovementMethod(LinkMovementMethod.getInstance());
+                    mIvGithubArrow.setVisibility(View.VISIBLE);
+                } else {
+                    mTvGitHubPage.setText(getString(R.string.no_settings));
                 }
 
+                // Html 解析得不到数据的情况
+                Glide.with(UserInfoActivity.this).load("http:" + memberDetail.getAvatarLarge())
+                        .into(mCiAvatar);
+                mTvV2exInfo.setText(getString(R.string.member_number).replace("{id}",
+                        memberDetail
+                                .getId()
+                                + ""));
+
+                fetchUserTopics(memberDetail.getUsername());
             }
         });
     }
 
     private void fetchUserTopics(String username) {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(V2EXApiService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create()).build();
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<List<Topic>> call = apiService.getTopicsByUsername(username);
-        call.enqueue(new Callback<List<Topic>>() {
+        V2EXHttpClient.getTopicsByUsername(this, username, new V2EXSubscriberAdapter<List<Topic>>
+                (this) {
             @Override
-            public void onResponse(Call<List<Topic>> call, Response<List<Topic>> response) {
-                if (response.code() == 200) {
-                    int start = mTopicList.size();
-                    mTopicList.addAll(response.body());
-                    mTopicsAdapter.notifyItemRangeInserted(start, mTopicList.size());
-                } else {
-                    Toast.makeText(UserInfoActivity.this, getString(R.string.http_error), Toast
-                            .LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Topic>> call, Throwable t) {
-                if (t != null) {
-                    Toast.makeText((UserInfoActivity.this), t.getMessage(), Toast.LENGTH_SHORT)
-                            .show();
-                }
+            public void onNext(List<Topic> topics) {
+                int start = mTopicList.size();
+                mTopicList.addAll(topics);
+                mTopicsAdapter.notifyItemRangeInserted(start, mTopicList.size());
             }
         });
     }

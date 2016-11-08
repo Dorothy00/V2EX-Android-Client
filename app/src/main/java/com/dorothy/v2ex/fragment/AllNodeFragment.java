@@ -15,24 +15,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.dorothy.v2ex.R;
 import com.dorothy.v2ex.View.WrapStaggeredGridLayoutManager;
 import com.dorothy.v2ex.activity.NodeTopicsActivity;
 import com.dorothy.v2ex.adapter.BaseRecyclerAdapter;
 import com.dorothy.v2ex.adapter.RecyclerViewHolder;
-import com.dorothy.v2ex.http.V2EXApiService;
+import com.dorothy.v2ex.http.V2EXHttpClient;
+import com.dorothy.v2ex.http.V2EXSubscriberAdapter;
 import com.dorothy.v2ex.models.NodeDetail;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AllNodeFragment extends Fragment implements
         SwipeRefreshLayout.OnRefreshListener, BaseRecyclerAdapter.OnItemClickListener {
@@ -46,7 +40,7 @@ public class AllNodeFragment extends Fragment implements
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable
-    Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_all_node, container, false);
         mNodeRecyclerView = (RecyclerView) root.findViewById(R.id.recycle_view);
         mSwipeView = (SwipeRefreshLayout) root.findViewById(R.id.swpie_view);
@@ -77,30 +71,23 @@ public class AllNodeFragment extends Fragment implements
     }
 
     private void fetchAllNode() {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(V2EXApiService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create()).build();
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<List<NodeDetail>> call = apiService.getAllNodes();
-        call.enqueue(new Callback<List<NodeDetail>>() {
+
+        V2EXHttpClient.getAllNodes(getActivity(), new V2EXSubscriberAdapter<List<NodeDetail>>
+                (getActivity()) {
             @Override
-            public void onResponse(Call<List<NodeDetail>> call, Response<List<NodeDetail>>
-                    response) {
-                if (response != null && response.isSuccessful()) {
-                    mNodeList.clear();
-                    mNodeList.addAll(response.body());
-                    mAdapter.notifyItemRangeInserted(0, mNodeList.size());
-                    mNodeRecyclerView.setHasFixedSize(true);
-                } else {
-                    Toast.makeText(getActivity(), getString(R.string.http_error), Toast
-                            .LENGTH_SHORT).show();
-                }
+            public void onNext(List<NodeDetail> nodeDetails) {
+                super.onNext(nodeDetails);
                 mSwipeView.setRefreshing(false);
+                mNodeList.clear();
+                mNodeList.addAll(nodeDetails);
+                mAdapter.notifyItemRangeInserted(0, mNodeList.size());
+                mNodeRecyclerView.setHasFixedSize(true);
             }
 
             @Override
-            public void onFailure(Call<List<NodeDetail>> call, Throwable t) {
-                Toast.makeText(getActivity(), getString(R.string.http_error), Toast
-                        .LENGTH_SHORT).show();
+            public void onError(Throwable e) {
+                super.onError(e);
+                mSwipeView.setRefreshing(false);
             }
         });
     }
@@ -113,7 +100,8 @@ public class AllNodeFragment extends Fragment implements
     @Override
     public void onItemClick(int pos) {
         NodeDetail nodeDetail = mNodeList.get(pos);
-        startActivity(NodeTopicsActivity.newIntent(getActivity(), nodeDetail.getName(), nodeDetail.getTitle()));
+        startActivity(NodeTopicsActivity.newIntent(getActivity(), nodeDetail.getName(),
+                nodeDetail.getTitle()));
     }
 
     class NodeAdapter extends BaseRecyclerAdapter<NodeDetail> {

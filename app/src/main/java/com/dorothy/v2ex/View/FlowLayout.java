@@ -1,6 +1,7 @@
 package com.dorothy.v2ex.View;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,6 @@ import java.util.List;
  */
 public class FlowLayout extends ViewGroup {
 
-    private Context mContext;
 
     public FlowLayout(Context context) {
         this(context, null);
@@ -25,7 +25,6 @@ public class FlowLayout extends ViewGroup {
 
     public FlowLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mContext = context;
     }
 
     @Override
@@ -50,7 +49,7 @@ public class FlowLayout extends ViewGroup {
             int childWidth = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
             int childHeight = child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
 
-            if (lineWidth + childWidth > sizeWidth) {
+            if (lineWidth + childWidth > sizeWidth - getPaddingLeft() - getPaddingRight()) {
                 width = Math.max(width, lineWidth);
                 lineWidth = childWidth;
                 height += lineHeight;
@@ -66,14 +65,18 @@ public class FlowLayout extends ViewGroup {
             }
         }
 
-        if (modeWidth != MeasureSpec.AT_MOST) {
+        if (modeWidth == MeasureSpec.EXACTLY) {
             width = sizeWidth;
+        } else {
+            width = width + getPaddingLeft() + getPaddingRight();
         }
-        if (modeHeight != MeasureSpec.AT_MOST) {
+        if (modeHeight == MeasureSpec.EXACTLY) {
             height = sizeHeight;
+        } else {
+            height = height + getPaddingBottom() + getPaddingTop();
         }
-        setMeasuredDimension(width, height);
 
+        setMeasuredDimension(width, height);
 
     }
 
@@ -98,7 +101,8 @@ public class FlowLayout extends ViewGroup {
             int childHeight = child.getMeasuredHeight();
 
             // 换行
-            if (lineWidth + childWidth + lp.rightMargin + lp.leftMargin > width) {
+            if (lineWidth + childWidth + lp.rightMargin + lp.leftMargin > width - getPaddingRight
+                    () - getPaddingLeft()) {
                 mLineHeights.add(lineHeight);
                 mViewList.add(lineViews);
 
@@ -116,13 +120,15 @@ public class FlowLayout extends ViewGroup {
         mLineHeights.add(lineHeight);
         mViewList.add(lineViews);
 
-        int left = 0;
-        int top = 0;
+        int left = getPaddingLeft();
+        int top = getPaddingTop();
         for (int i = 0; i < mViewList.size(); i++) {
             List<View> lineViewList = mViewList.get(i);
             lineHeight = mLineHeights.get(i);
             for (int j = 0; j < lineViewList.size(); j++) {
                 View child = lineViewList.get(j);
+                if (child.getVisibility() == View.GONE)
+                    continue;
                 MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
                 int lc = left + lp.leftMargin;
                 int rc = lc + child.getMeasuredWidth();
@@ -131,14 +137,23 @@ public class FlowLayout extends ViewGroup {
                 child.layout(lc, tc, rc, bc);
                 left += child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
             }
-            left = 0;
+            left = getPaddingLeft();
             top += lineHeight;
         }
     }
 
     @Override
-    public LayoutParams generateLayoutParams(AttributeSet attrs) {
-        return new MarginLayoutParams(mContext, attrs);
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
     }
 
+    @Override
+    public LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new MarginLayoutParams(getContext(), attrs);
+    }
+
+    @Override
+    protected LayoutParams generateDefaultLayoutParams() {
+        return new MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+    }
 }

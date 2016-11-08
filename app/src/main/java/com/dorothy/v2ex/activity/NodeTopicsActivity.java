@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -30,6 +29,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import rx.Subscriber;
 
 public class NodeTopicsActivity extends AppCompatActivity implements BaseRecyclerAdapter
         .OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
@@ -126,10 +126,8 @@ public class NodeTopicsActivity extends AppCompatActivity implements BaseRecycle
             return;
 
         int index = mCollectUrl.indexOf("=");
-        String once = mCollectUrl.substring(index+1);
-        Log.d("once: ------", once);
-        Log.d("url:--------", mCollectUrl);
-        Retrofit retrofit = V2EXHttpClient.retrofit(this);
+        String once = mCollectUrl.substring(index + 1);
+        Retrofit retrofit = V2EXHttpClient.stringRetrofit(this);
         V2EXApiService apiService = retrofit.create(V2EXApiService.class);
         Call<String> call = apiService.collectNode(mCollectUrl, once);
         call.enqueue(new Callback<String>() {
@@ -153,31 +151,25 @@ public class NodeTopicsActivity extends AppCompatActivity implements BaseRecycle
     }
 
     private void fetchTopics(String nodeName) {
-        Retrofit retrofit = V2EXHttpClient.retrofit(this);
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<String> call = apiService.getTopicsByNode(nodeName);
-        call.enqueue(new Callback<String>() {
+        V2EXHttpClient.getTopicsByNode(this, nodeName, new Subscriber<List<Topic>>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response != null && response.isSuccessful()) {
-                    List<Topic> topicList = V2EXHtmlParser.parseTopicList(response.body(),
-                            V2EXHtmlParser.FROM_NODE);
-                    mTopicList.clear();
-                    mTopicList.addAll(topicList);
-                    mAdapter.notifyItemRangeInserted(0, mTopicList.size());
+            public void onCompleted() {
 
-                    mCollectUrl = V2EXHtmlParser.parseCollectUrl(response.body());
-                    invalidateOptionsMenu();
-                } else {
-                    //TODO
-                }
+            }
 
+            @Override
+            public void onError(Throwable e) {
                 mSwipeView.setRefreshing(false);
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
-//TODO
+            public void onNext(List<Topic> topics) {
+                mTopicList.clear();
+                mTopicList.addAll(topics);
+                mAdapter.notifyItemRangeInserted(0, mTopicList.size());
+
+                //   mCollectUrl = V2EXHtmlParser.parseCollectUrl(response.body());
+                invalidateOptionsMenu();
                 mSwipeView.setRefreshing(false);
             }
         });

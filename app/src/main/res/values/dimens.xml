@@ -8,6 +8,10 @@
     <dimen name="corner2">4dp</dimen>
     <dimen name="corner3">6dp</dimen>
     <dimen name="corner4">8dp</dimen>
+    <dimen name="corner5">10dp</dimen>
+    <dimen name="corner6">12dp</dimen>
+    <dimen name="corner7">14dp</dimen>
+    <dimen name="corner8">16dp</dimen>
 
     <!-- textSize -->
     <dimen name="textSize1">2sp</dimen>

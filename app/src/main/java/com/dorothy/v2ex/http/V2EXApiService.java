@@ -15,68 +15,65 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import rx.Observable;
 
 /**
  * Created by dorothy on 16/8/5.
  */
 public interface V2EXApiService {
-    String BASE_URL = "http://www.v2ex.com";
 
     @GET("api/topics/latest.json")
-    Call<List<Topic>> getLatestTopics();
+    Observable<List<Topic>> getLatestTopics();
 
     @GET("api/topics/show.json")
-    Call<List<Topic>> getTopicsByUsername(@Query("username") String username);
+    Observable<List<Topic>> getTopicsByUsername(@Query("username") String username);
 
     @GET("/go/{node}")
-    Call<String> getTopicsByNode(@Path("node") String nodeName);
+    Observable<String> getTopicsByNode(@Path("node") String nodeName);
 
     @GET("api/topics/hot.json")
-    Call<List<Topic>> getHotTopics();
-
-    @GET("/api/replies/show.json")
-    Call<List<Reply>> getTopicReplies(@Query("topic_id") long topicId);
+    Observable<List<Topic>> getHotTopics();
 
     @GET("/api/members/show.json")
-    Call<MemberDetail> getMemberDetail(@Query("username") String username);
+    Observable<MemberDetail> getMemberDetail(@Query("username") String username);
 
     @GET("/")
-    Call<String> getTopicsByTab(@Query("tab") String tab);
+    Observable<String> getTopicsByTab(@Query("tab") String tab);
 
     @GET("/t/{id}")
-    Call<String> getTopicById(@Path("id") long id);
+    Observable<String> getTopicById(@Path("id") long id);
 
     @GET("/signin")
-    Call<String> getLoginPage();
+    Observable<String> getLoginPage();
 
     @FormUrlEncoded
     @POST("/signin")
-    Call<String> login(@FieldMap Map<String, String> params);
+    Observable<String> login(@FieldMap Map<String, String> params);
 
     @GET("/")
-    Call<String> getUserProfile();
+    Observable<String> getUserProfile();
 
     @GET("/notifications")
-    Call<String> getNotification();
+    Observable<String> getNotification();
 
     @GET("/api/nodes/all.json")
-    Call<List<NodeDetail>> getAllNodes();
+    Observable<List<NodeDetail>> getAllNodes();
 
     @FormUrlEncoded
     @POST("/t/{id}")
-    Call<String> commentTopic(@Path("id") long id, @FieldMap Map<String, String> params);
+    Observable<String> commentTopic(@Path("id") long id, @FieldMap Map<String, String> params);
 
     @GET("/my/nodes")
-    Call<String> getCollectedNodes();
+    Observable<String> getCollectedNodes();
 
     @GET("{path}")
     Call<String> collectNode(@Path("path") String path, @Query("once") String once);
 
     @GET("/new")
-    Call<String> getNewTopicPage();
+    Observable<String> getNewTopicPage();
 
     @FormUrlEncoded
     @POST("/new")
-    Call<String> postNewTopic(@FieldMap Map<String, String> params);
+    Observable<String> postNewTopic(@FieldMap Map<String, String> params);
 
 }

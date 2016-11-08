@@ -3,6 +3,7 @@ package com.dorothy.v2ex.http;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.dorothy.v2ex.utils.Misc;
 import com.dorothy.v2ex.utils.V2EXCookieManager;
 
 import java.io.IOException;

@@ -10,21 +10,15 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.dorothy.v2ex.R;
-import com.dorothy.v2ex.http.V2EXApiService;
 import com.dorothy.v2ex.http.V2EXHttpClient;
+import com.dorothy.v2ex.http.V2EXSubscriberAdapter;
 import com.dorothy.v2ex.models.UserProfile;
 import com.dorothy.v2ex.utils.UserCache;
 import com.dorothy.v2ex.utils.V2EXCookieManager;
 import com.dorothy.v2ex.utils.V2EXHtmlParser;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
@@ -94,88 +88,75 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
      */
     private void requestLoginPage() {
 
-        showProgressDialogs("正在登录...");
-        Retrofit retrofit = V2EXHttpClient.retrofit(this);
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<String> call = apiService.getLoginPage();
-        call.enqueue(new Callback<String>() {
+        showProgressDialog("正在登录...");
+
+        V2EXHttpClient.getLoginPage(this, new V2EXSubscriberAdapter<String>(this) {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response != null && response.isSuccessful()) {
-                    String[] fields = V2EXHtmlParser.parseLoginField(response.body());
-                    Map<String, String> paramsMap = new HashMap<>();
-                    paramsMap.put(fields[0], mEtUsername.getText().toString().trim());
-                    paramsMap.put(fields[1], mEtPassword.getText().toString().trim());
-                    paramsMap.put("once", fields[2]);
-                    paramsMap.put("next", "/");
-                    doLogin(paramsMap);
-                } else {
-                    dismissProgressDialog();
-                }
+            public void onNext(String s) {
+                super.onNext(s);
+                String[] fields = V2EXHtmlParser.parseLoginField(s);
+                Map<String, String> paramsMap = new HashMap<>();
+                paramsMap.put(fields[0], mEtUsername.getText().toString().trim());
+                paramsMap.put(fields[1], mEtPassword.getText().toString().trim());
+                paramsMap.put("once", fields[2]);
+                paramsMap.put("next", "/");
+                doLogin(paramsMap);
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onError(Throwable e) {
+                super.onError(e);
+                V2EXCookieManager.clearCookie(LoginActivity.this);
                 dismissProgressDialog();
             }
         });
     }
 
     private void doLogin(Map<String, String> params) {
-        Retrofit retrofit = V2EXHttpClient.retrofit(this);
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<String> call = apiService.login(params);
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response != null && response.isSuccessful()) {
-                    String htmlStr = response.body();
-                    if (V2EXHtmlParser.isLoginSuccess(htmlStr)) {
-                        List<String> cookies = response.headers().values("Set-Cookie");
-                        StringBuilder sb = new StringBuilder();
-                        for (String cookie : cookies) {
-                            sb.append(cookie);
-                        }
-                        fetchUserProfile();
 
-                    } else {
-                        // Login Failure
-                        dismissProgressDialog();
-                    }
+        V2EXHttpClient.login(this, params, new V2EXSubscriberAdapter<String>(this) {
+            @Override
+            public void onNext(String s) {
+                super.onNext(s);
+                if (V2EXHtmlParser.isLoginSuccess(s)) {
+                    fetchUserProfile();
+
+                } else {
+                    String errMsg = V2EXHtmlParser.parseLoginErrorMsg(s);
+                    showToast("登录失败: " + errMsg);
+                    V2EXCookieManager.clearCookie(LoginActivity.this);
+                    dismissProgressDialog();
                 }
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onError(Throwable e) {
+                super.onError(e);
                 dismissProgressDialog();
+                V2EXCookieManager.clearCookie(LoginActivity.this);
             }
         });
     }
 
     private void fetchUserProfile() {
-        Retrofit retrofit = V2EXHttpClient.retrofit(this);
-        V2EXApiService apiService = retrofit.create(V2EXApiService.class);
-        Call<String> call = apiService.getUserProfile();
-        call.enqueue(new Callback<String>() {
+
+        V2EXHttpClient.getUserProfile(this, new V2EXSubscriberAdapter<String>(this) {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onNext(String s) {
+                super.onNext(s);
                 dismissProgressDialog();
-                if (response != null && response.isSuccessful()) {
-                    //mDialog.dismiss();
-                    UserProfile userProfile = V2EXHtmlParser.parseUserProfile(response.body());
-                    UserCache.userCache(LoginActivity.this, userProfile);
-                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    //TODO
-                }
+                UserProfile userProfile = V2EXHtmlParser.parseUserProfile(s);
+                UserCache.userCache(LoginActivity.this, userProfile);
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                startActivity(intent);
+                finish();
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                //TODO
+            public void onError(Throwable e) {
+                super.onError(e);
                 dismissProgressDialog();
+                V2EXCookieManager.clearCookie(LoginActivity.this);
             }
         });
     }

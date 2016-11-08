@@ -19,13 +19,13 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mProgressDialog = new ProgressDialog(this, R.style.V2ex_ProgressDialog);
-        mProgressDialog.setCancelable(false);
+        mProgressDialog.setCancelable(true);
         mProgressDialog.setCanceledOnTouchOutside(false);
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
     }
 
-    public void showProgressDialogs(String msg) {
+    public void showProgressDialog(String msg) {
         if (mProgressDialog != null) {
             mProgressDialog.setMessage(msg);
             mProgressDialog.show();
@@ -33,7 +33,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
-    public void showProgressDialogs() {
+    public void showProgressDialog() {
         if (mProgressDialog != null) {
             mProgressDialog.show();
         }
@@ -42,12 +42,15 @@ public class BaseActivity extends AppCompatActivity {
     public void dismissProgressDialog() {
         if (mProgressDialog != null) {
             mProgressDialog.dismiss();
-            mProgressDialog = null;
         }
     }
 
     public void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    public void showLongToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 
 
