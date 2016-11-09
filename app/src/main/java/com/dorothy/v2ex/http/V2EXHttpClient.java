@@ -209,4 +209,17 @@ public class V2EXHttpClient {
                 ()).observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber);
     }
 
+    public static void getCollectedTopic(Context context, Subscriber<List<Topic>> subscriber){
+        V2EXApiService apiService = V2EXHttpClient.stringRetrofit(context).create(V2EXApiService
+                .class);
+        apiService.getCollectedTopic().flatMap(new Func1<String, Observable<List<Topic>>>() {
+            @Override
+            public Observable<List<Topic>> call(String s) {
+                List<Topic> topicList = V2EXHtmlParser.parseTopicList(s, V2EXHtmlParser.FROM_TAB);
+                return Observable.just(topicList);
+            }
+        }).subscribeOn(Schedulers.io()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers
+                .mainThread()).subscribe(subscriber);
+    }
+
 }

@@ -103,7 +103,7 @@ public class CollectedNodesActivity extends AppCompatActivity implements SwipeRe
         if (pos < 0 || pos > mNodeList.size() - 1)
             return;
         Node node = mNodeList.get(pos);
-        startActivity(NodeTopicsActivity.newIntent(this, node.getName(), node.getTitle()));
+        startActivity(TopicsActivity.newNodeIntent(this, node.getName(), node.getTitle()));
     }
 
 

@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.dorothy.v2ex.R;
 import com.dorothy.v2ex.View.WrapStaggeredGridLayoutManager;
-import com.dorothy.v2ex.activity.NodeTopicsActivity;
+import com.dorothy.v2ex.activity.TopicsActivity;
 import com.dorothy.v2ex.adapter.BaseRecyclerAdapter;
 import com.dorothy.v2ex.adapter.RecyclerViewHolder;
 import com.dorothy.v2ex.http.V2EXHttpClient;
@@ -121,7 +121,7 @@ public class AllNodeFragment extends Fragment implements
     @Override
     public void onItemClick(int pos) {
         NodeDetail nodeDetail = mNodeList.get(pos);
-        startActivity(NodeTopicsActivity.newIntent(getActivity(), nodeDetail.getName(),
+        startActivity(TopicsActivity.newNodeIntent(getActivity(), nodeDetail.getName(),
                 nodeDetail.getTitle()));
     }
 

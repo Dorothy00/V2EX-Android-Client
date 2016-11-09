@@ -53,10 +53,11 @@
                 android:layout_height="wrap_content">
                 <ImageView
                     android:id="@+id/img_node"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:background="@drawable/home"/>
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/ic_node_collected"/>
                 <TextView
                     android:id="@+id/node"
                     android:layout_width="wrap_content"
@@ -70,8 +71,8 @@
 
                 <ImageView
                     android:id="@+id/arrow_node"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_alignParentRight="true"
                     android:background="@drawable/arrow_right"/>
                 <TextView
@@ -98,10 +99,11 @@
                 android:layout_height="wrap_content">
                 <ImageView
                     android:id="@+id/img_topic"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:background="@drawable/home"/>
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/ic_collected"/>
                 <TextView
                     android:id="@+id/topic"
                     android:layout_width="wrap_content"
@@ -115,8 +117,8 @@
 
                 <ImageView
                     android:id="@+id/arrow_topic"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_alignParentRight="true"
                     android:background="@drawable/arrow_right"/>
                 <TextView
@@ -143,10 +145,11 @@
                 android:layout_height="wrap_content">
                 <ImageView
                     android:id="@+id/img_following"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:background="@drawable/home"/>
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/ic_favorite"/>
                 <TextView
                     android:id="@+id/following"
                     android:layout_width="wrap_content"
@@ -154,14 +157,14 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="@dimen/margin5"
                     android:layout_toRightOf="@id/img_following"
-                    android:text="主题收藏"
+                    android:text="特别关注"
                     android:textColor="@color/text_grey"
                     android:textSize="@dimen/textSize8"/>
 
                 <ImageView
                     android:id="@+id/arrow_following"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_alignParentRight="true"
                     android:background="@drawable/arrow_right"/>
                 <TextView
@@ -188,10 +191,11 @@
                 android:layout_height="wrap_content">
                 <ImageView
                     android:id="@+id/img_balance"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:background="@drawable/home"/>
+                    android:background="@drawable/ic_payment"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -203,8 +207,8 @@
                     android:textSize="@dimen/textSize8"/>
                 <ImageView
                     android:id="@+id/arrow_balance"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_alignParentRight="true"
                     android:background="@drawable/arrow_right"/>
                 <TextView
@@ -231,10 +235,11 @@
                 android:layout_height="wrap_content">
                 <ImageView
                     android:id="@+id/img_notification"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:background="@drawable/home"/>
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/ic_messenger"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -246,8 +251,8 @@
                     android:textSize="@dimen/textSize8"/>
                 <ImageView
                     android:id="@+id/arrow_notification"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_alignParentRight="true"
                     android:background="@drawable/arrow_right"/>
                 <TextView

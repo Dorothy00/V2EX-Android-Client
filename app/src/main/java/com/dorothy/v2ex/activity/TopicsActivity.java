@@ -19,6 +19,7 @@ import com.dorothy.v2ex.adapter.BaseRecyclerAdapter;
 import com.dorothy.v2ex.adapter.TopicsAdapter;
 import com.dorothy.v2ex.http.V2EXApiService;
 import com.dorothy.v2ex.http.V2EXHttpClient;
+import com.dorothy.v2ex.http.V2EXSubscriberAdapter;
 import com.dorothy.v2ex.models.Topic;
 import com.dorothy.v2ex.utils.V2EXHtmlParser;
 
@@ -29,9 +30,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import rx.Subscriber;
 
-public class NodeTopicsActivity extends AppCompatActivity implements BaseRecyclerAdapter
+public class TopicsActivity extends AppCompatActivity implements BaseRecyclerAdapter
         .OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private RecyclerView mTopicsRecyclerView;
@@ -42,11 +42,18 @@ public class NodeTopicsActivity extends AppCompatActivity implements BaseRecycle
     private String mNodeName;
     private boolean mIsCollected;
     private String mCollectUrl;
+    private String mAction;   // 从用户收藏的主题进入
 
-    public static Intent newIntent(Activity activity, String nodeName, String nodeTitle) {
-        Intent intent = new Intent(activity, NodeTopicsActivity.class);
+    public static Intent newNodeIntent(Activity activity, String nodeName, String nodeTitle) {
+        Intent intent = new Intent(activity, TopicsActivity.class);
         intent.putExtra("node_name", nodeName);
         intent.putExtra("node_title", nodeTitle);
+        return intent;
+    }
+
+    public static Intent newTopicIntent(Activity activity) {
+        Intent intent = new Intent(activity, TopicsActivity.class);
+        intent.setAction("topic");
         return intent;
     }
 
@@ -72,8 +79,9 @@ public class NodeTopicsActivity extends AppCompatActivity implements BaseRecycle
         mTopicsRecyclerView.setAdapter(mAdapter);
 
         Intent intent = getIntent();
+        mAction = intent.getAction();
         mNodeName = intent.getStringExtra("node_name");
-        if (!TextUtils.isEmpty(mNodeName)) {
+        if (!TextUtils.isEmpty(mNodeName) || !TextUtils.isEmpty(mAction)) {
             mToolbar.setTitle(intent.getStringExtra("node_title"));
             mSwipeView.post(new Runnable() {
                 @Override
@@ -138,41 +146,57 @@ public class NodeTopicsActivity extends AppCompatActivity implements BaseRecycle
                     mCollectUrl = V2EXHtmlParser.parseCollectUrl(htmlstr);
                     invalidateOptionsMenu();
                 } else {
-                    Toast.makeText(NodeTopicsActivity.this, "收藏失败", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TopicsActivity.this, "收藏失败", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(NodeTopicsActivity.this, getString(R.string.http_error), Toast
+                Toast.makeText(TopicsActivity.this, getString(R.string.http_error), Toast
                         .LENGTH_SHORT).show();
             }
         });
     }
 
-    private void fetchTopics(String nodeName) {
-        V2EXHttpClient.getTopicsByNode(this, nodeName, new Subscriber<List<Topic>>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
+    private void fetchTopicsByNode(String nodeName) {
+        V2EXHttpClient.getTopicsByNode(this, nodeName, new V2EXSubscriberAdapter<List<Topic>>
+                (this) {
             @Override
             public void onError(Throwable e) {
+                super.onError(e);
                 mSwipeView.setRefreshing(false);
             }
 
             @Override
             public void onNext(List<Topic> topics) {
-                mTopicList.clear();
-                mTopicList.addAll(topics);
-                mAdapter.notifyItemRangeInserted(0, mTopicList.size());
-
-                //   mCollectUrl = V2EXHtmlParser.parseCollectUrl(response.body());
-                invalidateOptionsMenu();
-                mSwipeView.setRefreshing(false);
+                renderView(topics);
             }
         });
+    }
+
+    private void fetchCollectedTopics() {
+        V2EXHttpClient.getCollectedTopic(this, new V2EXSubscriberAdapter<List<Topic>>(this) {
+            @Override
+            public void onNext(List<Topic> topics) {
+                super.onNext(topics);
+                renderView(topics);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                super.onError(e);
+            }
+        });
+    }
+
+    private void renderView(List<Topic> topics) {
+        mTopicList.clear();
+        mTopicList.addAll(topics);
+        mAdapter.notifyItemRangeInserted(0, mTopicList.size());
+
+        //   mCollectUrl = V2EXHtmlParser.parseCollectUrl(response.body());
+        invalidateOptionsMenu();
+        mSwipeView.setRefreshing(false);
     }
 
     private boolean isCollected(String collectUrl) {
@@ -191,6 +215,10 @@ public class NodeTopicsActivity extends AppCompatActivity implements BaseRecycle
 
     @Override
     public void onRefresh() {
-        fetchTopics(mNodeName);
+        if (!TextUtils.isEmpty(mNodeName)) {
+            fetchTopicsByNode(mNodeName);
+        } else {
+            fetchCollectedTopics();
+        }
     }
 }

@@ -86,7 +86,7 @@ public class NewTopicActivity extends BaseActivity {
                 super.onNext(s);
                 dismissProgressDialog();
                 if (V2EXHtmlParser.isPostNewTopicSuccess(s)) {
-                    Intent intent = NodeTopicsActivity.newIntent(NewTopicActivity.this, params.get("node_name"),params.get("node_name"));
+                    Intent intent = TopicsActivity.newNodeIntent(NewTopicActivity.this, params.get("node_name"),params.get("node_name"));
                     startActivity(intent);
                     finish();
                 } else {

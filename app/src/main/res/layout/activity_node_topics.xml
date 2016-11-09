@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.dorothy.v2ex.activity.NodeTopicsActivity">
+    tools:context="com.dorothy.v2ex.activity.TopicsActivity">
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar"/>

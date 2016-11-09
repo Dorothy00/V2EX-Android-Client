@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.dorothy.v2ex.R;
 import com.dorothy.v2ex.View.CircleImageView;
-import com.dorothy.v2ex.activity.NodeTopicsActivity;
+import com.dorothy.v2ex.activity.TopicsActivity;
 import com.dorothy.v2ex.models.Topic;
 
 import java.util.List;
@@ -69,7 +69,7 @@ public class TopicsAdapter extends BaseRecyclerAdapter<Topic> implements View.On
         if (v.getTag() instanceof Integer) {
             int pos = (Integer) v.getTag();
             Topic topic = dataList.get(pos);
-            context.startActivity(NodeTopicsActivity.newIntent((Activity) context, topic.getNode
+            context.startActivity(TopicsActivity.newNodeIntent((Activity) context, topic.getNode
                     ().getName(), topic.getNode().getTitle()));
         }
     }

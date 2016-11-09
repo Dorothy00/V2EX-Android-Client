@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide;
 import com.dorothy.v2ex.R;
 import com.dorothy.v2ex.View.CircleImageView;
 import com.dorothy.v2ex.activity.CollectedNodesActivity;
+import com.dorothy.v2ex.activity.TopicsActivity;
 import com.dorothy.v2ex.activity.NotificationActivity;
 import com.dorothy.v2ex.models.UserProfile;
 import com.dorothy.v2ex.utils.UserCache;
@@ -33,12 +34,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private TextView mTvNotification;
     private RelativeLayout mRlNoticationContainer;
     private RelativeLayout mRlNodeContainer;
+    private RelativeLayout mRlCollTopicContainer;
     private Button mBtnLogout;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable
-    Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
 
         mCiAvatar = (CircleImageView) root.findViewById(R.id.avatar);
@@ -50,9 +52,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mTvNotification = (TextView) root.findViewById(R.id.notification_count);
         mRlNoticationContainer = (RelativeLayout) root.findViewById(R.id.notification_container);
         mRlNodeContainer = (RelativeLayout) root.findViewById(R.id.node_container);
+        mRlCollTopicContainer = (RelativeLayout) root.findViewById(R.id.topic_container);
         mBtnLogout = (Button) root.findViewById(R.id.logout);
 
         mRlNoticationContainer.setOnClickListener(this);
+        mRlCollTopicContainer.setOnClickListener(this);
         mRlNodeContainer.setOnClickListener(this);
         mBtnLogout.setOnClickListener(this);
         return root;
@@ -83,6 +87,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.node_container:
                 startActivity(new Intent(getActivity(), CollectedNodesActivity.class));
+                break;
+            case R.id.topic_container:
+                startActivity(TopicsActivity.newTopicIntent(getActivity()));
                 break;
             case R.id.logout:
                 showDialog();

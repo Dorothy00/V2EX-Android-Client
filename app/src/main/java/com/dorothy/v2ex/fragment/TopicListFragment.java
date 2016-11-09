@@ -1,7 +1,9 @@
 package com.dorothy.v2ex.fragment;
 
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -47,6 +49,7 @@ public class TopicListFragment extends Fragment implements BaseRecyclerAdapter.O
     public static final String TOPIC_ALL = "all";
     public static final String TOPIC_R2 = "R2";
     public static final String TOPIC_FOCUS = "member";
+    public static final String TOPIC_Collected = "collected";
 
     private RecyclerView mRvTopicsView;
     private List<Topic> mTopicList = new ArrayList<>();
@@ -64,7 +67,6 @@ public class TopicListFragment extends Fragment implements BaseRecyclerAdapter.O
         fragment.setArguments(bundle);
         return fragment;
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

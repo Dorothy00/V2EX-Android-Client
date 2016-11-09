@@ -76,4 +76,7 @@ public interface V2EXApiService {
     @POST("/new")
     Observable<String> postNewTopic(@FieldMap Map<String, String> params);
 
+    @GET("/my/topics")
+    Observable<String> getCollectedTopic();
+
 }
