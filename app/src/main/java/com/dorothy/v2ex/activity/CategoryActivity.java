@@ -1,5 +1,6 @@
 package com.dorothy.v2ex.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,7 +17,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryActivity extends BaseActivity {
+public class CategoryActivity extends BaseActivity implements View.OnClickListener {
 
     private FlowLayout mFlowLayout;
     private List<NodeDetail> mNodeList = new ArrayList<>();
@@ -67,11 +68,24 @@ public class CategoryActivity extends BaseActivity {
     }
 
     private void addButton() {
-        for (NodeDetail nodeDetail : mNodeList) {
+        for (int i = 0; i < mNodeList.size(); i++) {
+            NodeDetail nodeDetail = mNodeList.get(i);
             View view = getLayoutInflater().inflate(R.layout.btn_category, null);
             Button button = (Button) view.findViewById(R.id.btn_category);
             button.setText(nodeDetail.getName());
+            button.setTag(i);
+            button.setOnClickListener(this);
             mFlowLayout.addView(view);
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent();
+        NodeDetail nodeDetail = mNodeList.get((Integer) v.getTag());
+        intent.putExtra("node_title", nodeDetail.getTitle());
+        intent.putExtra("node_name", nodeDetail.getName());
+        setResult(NewTopicActivity.RESULT_CODE, intent);
+        finish();
     }
 }

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
@@ -23,6 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NewTopicActivity extends BaseActivity {
+
+    public static final int REQUEST_CODE = 0x11;
+    public static final int RESULT_CODE = 0x12;
 
     private EditText mEtTitle;
     private EditText mEtContet;
@@ -77,8 +81,8 @@ public class NewTopicActivity extends BaseActivity {
         params.put("once", once);
         params.put("title", mEtTitle.getText().toString());
         params.put("content", mEtContet.getText().toString());
-        //params.put("node_name", mNodeName);
-        params.put("node_name", "sandbox");
+        params.put("node_name", mNodeName);
+        //params.put("node_name", "sandbox");
 
         V2EXHttpClient.postNewTopic(this, params, new V2EXSubscriberAdapter<String>(this) {
             @Override
@@ -86,7 +90,8 @@ public class NewTopicActivity extends BaseActivity {
                 super.onNext(s);
                 dismissProgressDialog();
                 if (V2EXHtmlParser.isPostNewTopicSuccess(s)) {
-                    Intent intent = TopicsActivity.newNodeIntent(NewTopicActivity.this, params.get("node_name"),params.get("node_name"));
+                    Intent intent = TopicsActivity.newNodeIntent(NewTopicActivity.this, params
+                            .get("node_name"), params.get("node_name"));
                     startActivity(intent);
                     finish();
                 } else {
@@ -126,10 +131,19 @@ public class NewTopicActivity extends BaseActivity {
                 }
                 break;
             case R.id.menu_category:
-                startActivity(new Intent(this, CategoryActivity.class));
+                startActivityForResult(new Intent(this, CategoryActivity.class), REQUEST_CODE);
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_CODE) {
+            mNodeName = data.getStringExtra("node_name");
+            mToolbar.setTitle(data.getStringExtra("node_title"));
+        }
     }
 
     @Override

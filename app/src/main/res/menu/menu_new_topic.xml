@@ -4,9 +4,8 @@
 
     <item
         android:id="@+id/menu_category"
-        android:icon="@drawable/ic_subject"
         android:orderInCategory="80"
-        android:title="分类"
+        android:title="节点"
         app:showAsAction="always"/>
     <item
         android:id="@+id/menu_send"
