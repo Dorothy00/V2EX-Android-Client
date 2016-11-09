@@ -24,6 +24,9 @@ import com.dorothy.v2ex.adapter.RecyclerViewHolder;
 import com.dorothy.v2ex.http.V2EXHttpClient;
 import com.dorothy.v2ex.http.V2EXSubscriberAdapter;
 import com.dorothy.v2ex.models.NodeDetail;
+import com.dorothy.v2ex.utils.FileUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +39,7 @@ public class AllNodeFragment extends Fragment implements
     private WrapStaggeredGridLayoutManager layoutManager;
     private SwipeRefreshLayout mSwipeView;
     private NodeAdapter mAdapter;
+    private boolean mIsFirstLoad = true;
 
     @Nullable
     @Override
@@ -70,18 +74,29 @@ public class AllNodeFragment extends Fragment implements
         onRefresh();
     }
 
-    private void fetchAllNode() {
+    private void fetchAllNode(boolean isRefresh) {
+        String nodesStr = (String) FileUtil.readObject(getActivity());
+        if (!isRefresh && nodesStr != null) {
+            mSwipeView.post(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeView.setRefreshing(false);
+                }
+            });
+            List<NodeDetail> nodeDetails = new Gson().fromJson(nodesStr, new
+                    TypeToken<List<NodeDetail>>() {
+                    }.getType());
+            renderView(nodeDetails);
+            return;
+        }
 
         V2EXHttpClient.getAllNodes(getActivity(), new V2EXSubscriberAdapter<List<NodeDetail>>
                 (getActivity()) {
             @Override
             public void onNext(List<NodeDetail> nodeDetails) {
-                super.onNext(nodeDetails);
-                mSwipeView.setRefreshing(false);
-                mNodeList.clear();
-                mNodeList.addAll(nodeDetails);
-                mAdapter.notifyItemRangeInserted(0, mNodeList.size());
-                mNodeRecyclerView.setHasFixedSize(true);
+                renderView(nodeDetails);
+                FileUtil.deleteObject(getActivity());
+                FileUtil.saveObject(getActivity(), new Gson().toJson(nodeDetails));
             }
 
             @Override
@@ -94,7 +109,13 @@ public class AllNodeFragment extends Fragment implements
 
     @Override
     public void onRefresh() {
-        fetchAllNode();
+        if (mIsFirstLoad) {
+            mIsFirstLoad = false;
+            fetchAllNode(false);
+        } else {
+            fetchAllNode(true);
+        }
+
     }
 
     @Override
@@ -102,6 +123,14 @@ public class AllNodeFragment extends Fragment implements
         NodeDetail nodeDetail = mNodeList.get(pos);
         startActivity(NodeTopicsActivity.newIntent(getActivity(), nodeDetail.getName(),
                 nodeDetail.getTitle()));
+    }
+
+    private void renderView(List<NodeDetail> nodeDetails) {
+        mSwipeView.setRefreshing(false);
+        mNodeList.clear();
+        mNodeList.addAll(nodeDetails);
+        mAdapter.notifyItemRangeInserted(0, mNodeList.size());
+        mNodeRecyclerView.setHasFixedSize(true);
     }
 
     class NodeAdapter extends BaseRecyclerAdapter<NodeDetail> {

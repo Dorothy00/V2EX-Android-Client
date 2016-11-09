@@ -60,7 +60,6 @@ public class NewTopicActivity extends BaseActivity {
         V2EXHttpClient.getNewTopicPage(this, new V2EXSubscriberAdapter<String>(this) {
             @Override
             public void onNext(String s) {
-                dismissProgressDialog();
                 String once = V2EXHtmlParser.parseNewTopicOnce(s);
                 postNewTopic(once);
             }
@@ -74,19 +73,22 @@ public class NewTopicActivity extends BaseActivity {
     }
 
     private void postNewTopic(String once) {
-        Map<String, String> params = new HashMap<>();
+        final Map<String, String> params = new HashMap<>();
         params.put("once", once);
         params.put("title", mEtTitle.getText().toString());
         params.put("content", mEtContet.getText().toString());
-        params.put("node_name", mNodeName);
-        //params.put("node_name", "sandbox");
+        //params.put("node_name", mNodeName);
+        params.put("node_name", "sandbox");
 
         V2EXHttpClient.postNewTopic(this, params, new V2EXSubscriberAdapter<String>(this) {
             @Override
             public void onNext(String s) {
                 super.onNext(s);
+                dismissProgressDialog();
                 if (V2EXHtmlParser.isPostNewTopicSuccess(s)) {
-                    showToast("发布成功");
+                    Intent intent = NodeTopicsActivity.newIntent(NewTopicActivity.this, params.get("node_name"),params.get("node_name"));
+                    startActivity(intent);
+                    finish();
                 } else {
                     showLongToast(V2EXHtmlParser.parseNewTopicProblem(s));
                 }
@@ -94,6 +96,7 @@ public class NewTopicActivity extends BaseActivity {
 
             @Override
             public void onError(Throwable e) {
+                dismissProgressDialog();
                 if (e instanceof NetWorkUnavaliableException) {
                     showToast("网络未连接");
                 } else {

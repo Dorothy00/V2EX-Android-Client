@@ -2,10 +2,12 @@ package com.dorothy.v2ex.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by dorothy on 16/9/6.
  */
-public class NodeDetail {
+public class NodeDetail implements Serializable {
     private String created;
     private String footer;
     private String header;

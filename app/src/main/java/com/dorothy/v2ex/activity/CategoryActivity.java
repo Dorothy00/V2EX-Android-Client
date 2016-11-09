@@ -9,6 +9,9 @@ import com.dorothy.v2ex.View.FlowLayout;
 import com.dorothy.v2ex.http.V2EXHttpClient;
 import com.dorothy.v2ex.http.V2EXSubscriberAdapter;
 import com.dorothy.v2ex.models.NodeDetail;
+import com.dorothy.v2ex.utils.FileUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,16 +32,24 @@ public class CategoryActivity extends BaseActivity {
 
 
     private void fetchAllNode() {
-        showProgressDialog();
+        String nodesStr = (String) FileUtil.readObject(this);
+        if (nodesStr != null) {
+            List<NodeDetail> nodeDetails = new Gson().fromJson(nodesStr, new
+                    TypeToken<List<NodeDetail>>() {
+                    }.getType());
+            renderView(nodeDetails);
+            return;
+        }
 
+        showProgressDialog();
         V2EXHttpClient.getAllNodes(this, new V2EXSubscriberAdapter<List<NodeDetail>>(this) {
             @Override
             public void onNext(List<NodeDetail> nodeDetails) {
                 super.onNext(nodeDetails);
                 dismissProgressDialog();
-                mNodeList.clear();
-                mNodeList.addAll(nodeDetails);
-                addButton();
+                renderView(nodeDetails);
+                FileUtil.deleteObject(CategoryActivity.this);
+                FileUtil.saveObject(CategoryActivity.this, new Gson().toJson(nodeDetails));
             }
 
             @Override
@@ -47,6 +58,12 @@ public class CategoryActivity extends BaseActivity {
                 dismissProgressDialog();
             }
         });
+    }
+
+    private void renderView(List<NodeDetail> nodeDetails) {
+        mNodeList.clear();
+        mNodeList.addAll(nodeDetails);
+        addButton();
     }
 
     private void addButton() {
